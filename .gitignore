@@ -13,3 +13,11 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# swig generated files
+third_party/occt/libocct_wrap.*
+third_party/occt/occt.go
+third_party/occt/occt_gc.c
+third_party/planegcs/libplanegcs_wrap.*
+third_party/planegcs/planegcs.go
+third_party/planegcs/planegcs_gc.c
