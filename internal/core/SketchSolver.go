@@ -6,12 +6,13 @@ package core
  */
 type SketchSolver interface {
 	//createSketch(PlaneParameters) Sketch2D
-	LookupEntity(uint) Entity
-	CreatePoint(float64, float64) Entity
-	CreateLine(Entity, Entity) Entity
-	CreateCircle(Entity, float64) Entity
-	CreateArc(Entity, Entity, Entity)
-	CreateDistance(float64) Entity
+	// LookupEntity(uint) Entity
+	CreatePoint(float64, float64) *Point
+	CreateLine(Entity, Entity) *Line
+	CreateCircle(Entity, float64) *Circle
+	CreateArc(Entity, Entity, Entity) *Arc
+	CreateDistance(float64) *Distance
+	// Creates fixed entities not solved for
 	CreateWorkplanePoint(float64, float64)
 	CreateWorkplaneLine(Entity, Entity) Entity
 	CreateWorkplaneCircle(Entity, float64) Entity
@@ -33,4 +34,5 @@ type SketchSolver interface {
 	EqualCircles(Entity, Entity)
 	CircleDiameter(Entity, float64)
 	Solve()
+	ToFace() *Face
 }
