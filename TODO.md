@@ -1,0 +1,5 @@
+- [ ] Review c++ makercad, determine element APIs
+- [ ] Plan sketch types to be compatible with makercad elements
+- [ ] Build out sketch elements
+- [ ] Complete SketchSolver interface in DlineateSolver
+- [ ] Build External API

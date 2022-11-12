@@ -8,31 +8,29 @@ type SketchSolver interface {
 	//createSketch(PlaneParameters) Sketch2D
 	// LookupEntity(uint) Entity
 	CreatePoint(float64, float64) *Point
-	CreateLine(Entity, Entity) *Line
-	CreateCircle(Entity, float64) *Circle
-	CreateArc(Entity, Entity, Entity) *Arc
+	CreateLine(*Point, *Point) *Line
+	CreateCircle(*Point, float64) *Circle
+	CreateArc(*Point, *Point, *Point) *Arc
 	CreateDistance(float64) *Distance
 	// Creates fixed entities not solved for
-	CreateWorkplanePoint(float64, float64)
-	CreateWorkplaneLine(Entity, Entity) Entity
-	CreateWorkplaneCircle(Entity, float64) Entity
-	CreateWorkplaneArc(Entity, Entity, Entity)
-	CreateWorkplaneDistance(float64) Entity
+	CreateWorkplanePoint(float64, float64) *Point
+	CreateWorkplaneLine(*Point, *Point) *Line
+	CreateWorkplaneCircle(*Point, float64) *Circle
+	CreateWorkplaneArc(*Point, *Point, *Point) *Arc
 
-	PointCoincident(Entity, Entity)
-	PointVerticalDistance(Entity, Entity, float64)
-	PointHorizontalDistance(Entity, Entity, float64)
-	PointProjectedDistance(Entity, Entity, Entity, float64)
-	LineSymmetric(Entity, Entity, Entity)
-	LineMidpoint(Entity, Entity)
-	LineAngle(Entity, Entity, float64)
-	ArcLineTangent(Entity, Entity, int)
-	Distance(float64, Entity, Entity)
+	Coincident(Entity, Entity)
+	PointVerticalDistance(*Point, Entity, float64)
+	PointHorizontalDistance(*Point, Entity, float64)
+	PointProjectedDistance(*Point, Entity, Entity, float64)
+	LineMidpoint(*Line, Entity)
+	LineAngle(*Line, *Line, float64)
+	ArcLineTangent(*Arc, *Line)
+	Distance(Entity, Entity, float64)
 	Horizontal(Entity, Entity)
 	Vertical(Entity, Entity)
-	LineLength(float64, Entity)
-	EqualCircles(Entity, Entity)
-	CircleDiameter(Entity, float64)
+	LineLength(*Line, float64)
+	Equal(Entity, Entity)
+	CurveDiameter(Entity, float64)
 	Solve()
 	ToFace() *Face
 }
