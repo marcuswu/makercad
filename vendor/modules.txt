@@ -1,0 +1,120 @@
+# github.com/ByteArena/poly2tri-go v0.0.0-20170716161910-d102ad91854f
+## explicit
+github.com/ByteArena/poly2tri-go
+# github.com/adrg/strutil v0.3.0
+## explicit; go 1.14
+github.com/adrg/strutil
+github.com/adrg/strutil/internal/mathutil
+github.com/adrg/strutil/internal/ngram
+github.com/adrg/strutil/internal/stringutil
+github.com/adrg/strutil/metrics
+# github.com/adrg/sysfont v0.1.2
+## explicit; go 1.14
+github.com/adrg/sysfont
+# github.com/adrg/xdg v0.4.0
+## explicit; go 1.14
+github.com/adrg/xdg
+github.com/adrg/xdg/internal/pathutil
+# github.com/benoitkugler/textlayout v0.2.1
+## explicit; go 1.17
+github.com/benoitkugler/textlayout/fonts
+github.com/benoitkugler/textlayout/fonts/binaryreader
+github.com/benoitkugler/textlayout/fonts/glyphsnames
+github.com/benoitkugler/textlayout/fonts/psinterpreter
+github.com/benoitkugler/textlayout/fonts/simpleencodings
+github.com/benoitkugler/textlayout/fonts/truetype
+github.com/benoitkugler/textlayout/fonts/type1C
+github.com/benoitkugler/textlayout/graphite
+github.com/benoitkugler/textlayout/harfbuzz
+github.com/benoitkugler/textlayout/language
+github.com/benoitkugler/textlayout/unicodedata
+# github.com/benoitkugler/textprocessing v0.0.2
+## explicit; go 1.16
+github.com/benoitkugler/textprocessing/fribidi
+# github.com/dsnet/compress v0.0.1
+## explicit; go 1.9
+github.com/dsnet/compress/brotli
+github.com/dsnet/compress/internal
+github.com/dsnet/compress/internal/errors
+# github.com/go-latex/latex v0.0.0-20210823091927-c0d11ff05a81
+## explicit; go 1.16
+github.com/go-latex/latex
+github.com/go-latex/latex/ast
+github.com/go-latex/latex/drawtex
+github.com/go-latex/latex/font
+github.com/go-latex/latex/font/ttf
+github.com/go-latex/latex/internal/tex2unicode
+github.com/go-latex/latex/mtex
+github.com/go-latex/latex/mtex/symbols
+github.com/go-latex/latex/tex
+github.com/go-latex/latex/token
+# github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
+## explicit
+github.com/golang/freetype/raster
+github.com/golang/freetype/truetype
+# github.com/marcuswu/dlineate v0.0.0-20221112003328-59a62ccacbfa
+## explicit; go 1.18
+github.com/marcuswu/dlineate
+github.com/marcuswu/dlineate/internal
+github.com/marcuswu/dlineate/internal/constraint
+github.com/marcuswu/dlineate/internal/element
+github.com/marcuswu/dlineate/internal/solver
+github.com/marcuswu/dlineate/internal/utils
+github.com/marcuswu/dlineate/utils
+# github.com/mattn/go-colorable v0.1.13
+## explicit; go 1.15
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.16
+## explicit; go 1.15
+github.com/mattn/go-isatty
+# github.com/rs/zerolog v1.28.0
+## explicit; go 1.15
+github.com/rs/zerolog
+github.com/rs/zerolog/internal/cbor
+github.com/rs/zerolog/internal/json
+github.com/rs/zerolog/log
+# github.com/tdewolff/canvas v0.0.0-20221109210221-a54e60d185cf
+## explicit; go 1.17
+github.com/tdewolff/canvas
+github.com/tdewolff/canvas/font
+github.com/tdewolff/canvas/renderers/svg
+github.com/tdewolff/canvas/text
+# github.com/tdewolff/minify/v2 v2.12.4
+## explicit; go 1.13
+github.com/tdewolff/minify/v2
+# github.com/tdewolff/parse/v2 v2.6.4
+## explicit; go 1.13
+github.com/tdewolff/parse/v2
+github.com/tdewolff/parse/v2/buffer
+github.com/tdewolff/parse/v2/strconv
+github.com/tdewolff/parse/v2/xml
+# golang.org/x/image v0.1.0
+## explicit; go 1.12
+golang.org/x/image/ccitt
+golang.org/x/image/font
+golang.org/x/image/font/gofont/gobold
+golang.org/x/image/font/gofont/gobolditalic
+golang.org/x/image/font/gofont/goitalic
+golang.org/x/image/font/gofont/goregular
+golang.org/x/image/font/opentype
+golang.org/x/image/font/sfnt
+golang.org/x/image/math/fixed
+golang.org/x/image/tiff
+golang.org/x/image/tiff/lzw
+golang.org/x/image/vector
+# golang.org/x/sys v0.2.0
+## explicit; go 1.17
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+# golang.org/x/text v0.4.0
+## explicit; go 1.17
+golang.org/x/text/encoding
+golang.org/x/text/encoding/charmap
+golang.org/x/text/encoding/internal
+golang.org/x/text/encoding/internal/identifier
+golang.org/x/text/encoding/unicode
+golang.org/x/text/internal/utf8internal
+golang.org/x/text/runes
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi

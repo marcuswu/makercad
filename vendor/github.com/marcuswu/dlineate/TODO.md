@@ -1,0 +1,33 @@
+- [X] Return details about under / over constrained elements
+- [X] Rework pkg/Solver to use maps to handle findConstraint(s)
+- [X] Add SVG export functionality to visualize input and output
+- [X] Build out some core examples / tests
+  - [X] Fix square example -- internal solver tests succeed, but using pkg/ fails... something wrong with interface
+        Or something is wrong with internal that is exposed via how the interface is using it
+  - [X] Add / fix distance constraint for a line
+  - [X] Figure out how to handle origin and axes
+  - [X] Fix tests
+  - [X] Build out the pentagon example
+  - [X] Build out the BellSketch from the curta II project
+  - [X] Add identifiers to clusters and use for logging and graphviz output
+  - [X] Fix compound elements (adding too many internal elements)
+  - [X] Fix resolution of curve radius constraints
+  - [X] Rework cluster creation to generate a map of shared elements
+  - [X] Rework merging to utilize shared element map -- turns out to be slower
+  - [X] Fix merge when all of cluster 0 is in cluster 1
+  - [X] Fix solved constraints showing as unsolved in pkg/Solver
+  - [X] Fix pentagon cluster 0, 1 merge (no elements in cluster 0!?)
+  - [X] Fix svg output for the modified cylinder example
+  - [X] Improve logging
+  - [X] Update unit tests
+    - [X] SolveDistanceConstraint 0 distance translate
+  - [X] Get the BellSketch (modifiedCylinder) working
+  - [X] Add horizontal, vertical constraints
+- [X] Load element values from solver when solved
+- [X] External interface should take two passes. One to solve independent constraints. One to solve dependent.
+- [X] Ratio & equality lengths are dependent constraints
+- [X] Add the ability to add fixed elements
+- [X] Add the ability to retrieve level of constraint for elements
+- [X] Add the ability to retrieve a list of conflicting constraints
+- [X] Add mapping 2D sketch to 3D workplane -- nvm, this will be handled in MakerCAD
+- [ ] Add documentation

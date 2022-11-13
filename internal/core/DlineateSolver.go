@@ -11,8 +11,13 @@ func NewDlineateSolver() *DlineateSolver {
 }
 
 func (s *DlineateSolver) CreatePoint(x float64, y float64) *Point {
-	return &Point{Element: *s.system.AddPoint(x, y), x: x, y: y, construction: false}
+	return &Point{Element: *s.system.AddPoint(x, y), X: x, Y: y, IsConstruction: false}
 }
 
 func (s *DlineateSolver) CreateLine(p1 *Point, p2 *Point) *Line {
+	return nil
+}
+
+func (s *DlineateSolver) ToFace() *Face {
+	return nil
 }

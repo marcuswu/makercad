@@ -11,7 +11,7 @@ type SketchSolver interface {
 	CreateLine(*Point, *Point) *Line
 	CreateCircle(*Point, float64) *Circle
 	CreateArc(*Point, *Point, *Point) *Arc
-	CreateDistance(float64) *Distance
+	// CreateDistance(float64) *Distance
 	// Creates fixed entities not solved for
 	CreateWorkplanePoint(float64, float64) *Point
 	CreateWorkplaneLine(*Point, *Point) *Line
