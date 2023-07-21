@@ -1,4 +1,4 @@
 package core
 
-type Face struct {
+type Face interface {
 }

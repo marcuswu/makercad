@@ -48,6 +48,8 @@ github.com/klauspost/compress v1.4.1/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0
 github.com/klauspost/cpuid v1.2.0/go.mod h1:Pj4uuM528wm8OyEC2QMXAi2YiTZ96dNQPGgoMS4s3ek=
 github.com/marcuswu/dlineate v0.0.0-20221112003328-59a62ccacbfa h1:jWOuC+GzTVEPmcirSW75FHr4yuHRRWdMZKQJntpUY3w=
 github.com/marcuswu/dlineate v0.0.0-20221112003328-59a62ccacbfa/go.mod h1:Eae22df9JDclWyrJzcw/Q4JOGF65XBD/QKCbCRsFcpM=
+github.com/marcuswu/gooccwrapper v0.0.0-20230226165123-0624d80c9c72 h1:ft14puN72ajbMfnJ2IvLp78BSWxlWobRrzYU2+wX/ws=
+github.com/marcuswu/gooccwrapper v0.0.0-20230226165123-0624d80c9c72/go.mod h1:nBiCVUKtPlhbqAw2lVxYGWdqMSH6ZRYFRTlkXd+641c=
 github.com/matryer/try v0.0.0-20161228173917-9ac251b645a2/go.mod h1:0KeJpeMD6o+O4hW7qJOT7vyQPKrWmj26uf5wMc/IiIs=
 github.com/mattn/go-colorable v0.1.12/go.mod h1:u5H1YNBxpqRaxsYJYSkiCWKzEfiAb1Gb520KVy5xxl4=
 github.com/mattn/go-colorable v0.1.13 h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=

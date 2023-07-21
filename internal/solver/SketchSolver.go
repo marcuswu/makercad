@@ -1,4 +1,4 @@
-package core
+package solver
 
 /*
  * 2D Geometric Constraint Solver should implement this interface.

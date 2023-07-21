@@ -61,6 +61,9 @@ github.com/marcuswu/dlineate/internal/element
 github.com/marcuswu/dlineate/internal/solver
 github.com/marcuswu/dlineate/internal/utils
 github.com/marcuswu/dlineate/utils
+# github.com/marcuswu/gooccwrapper v0.0.0-20230226165123-0624d80c9c72
+## explicit; go 1.19
+github.com/marcuswu/gooccwrapper/gp
 # github.com/mattn/go-colorable v0.1.13
 ## explicit; go 1.15
 github.com/mattn/go-colorable

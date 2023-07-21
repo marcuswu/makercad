@@ -1,4 +1,4 @@
-package core
+package solver
 
 import "github.com/marcuswu/dlineate"
 

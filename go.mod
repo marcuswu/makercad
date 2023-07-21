@@ -1,8 +1,11 @@
-module libmakercad
+module github.com/marcuswu/libmakercad
 
 go 1.18
 
-require github.com/marcuswu/dlineate v0.0.0-20221112003328-59a62ccacbfa
+require (
+	github.com/marcuswu/dlineate v0.0.0-20221112003328-59a62ccacbfa
+	github.com/marcuswu/gooccwrapper v0.0.0-20230226165123-0624d80c9c72
+)
 
 require (
 	github.com/ByteArena/poly2tri-go v0.0.0-20170716161910-d102ad91854f // indirect
