@@ -9,3 +9,5 @@ func ToRadians(degrees float64) float64 {
 func ToDegrees(radians float64) float64 {
 	return 180 * (radians / math.Pi)
 }
+
+const Confusion = 1.e-7

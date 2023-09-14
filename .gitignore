@@ -12,7 +12,8 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+# Excluding for now -- may want to add it in the future
+vendor/**
 
 # swig generated files
 third_party/occt/libocct_wrap.*

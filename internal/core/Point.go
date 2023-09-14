@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/marcuswu/dlineate"
+	"github.com/marcuswu/gooccwrapper/gp"
 )
 
 type Point struct {
@@ -12,6 +13,10 @@ type Point struct {
 	X              float64
 	Y              float64
 	IsConstruction bool
+}
+
+func (p *Point) isConstruction() bool {
+	return p.IsConstruction
 }
 
 func (p *Point) getElement() *dlineate.Element {
@@ -25,12 +30,12 @@ func (p *Point) Coincident(other Entity) *Point {
 }
 
 func (p *Point) Horizontal(p2 *Point) *Point {
-	p.solver.Horizontal(p, p2)
+	p.solver.HorizontalPoints(p, p2)
 	return p
 }
 
 func (p *Point) Vertical(p2 *Point) *Point {
-	p.solver.Vertical(p, p2)
+	p.solver.VerticalPoints(p, p2)
 	return p
 }
 
@@ -54,4 +59,12 @@ func (p *Point) VerticalDistance(other Entity, distance float64) *Point {
 
 func (p *Point) ToString() string {
 	return fmt.Sprintf("%f, %f", p.X, p.Y)
+}
+
+func (p *Point) Convert() gp.Pnt {
+	return gp.NewPnt(p.X, p.Y, 0).Transformed(p.solver.Transform())
+}
+
+func (p *Point) MakeEdge() *Edge {
+	return nil
 }

@@ -2,7 +2,9 @@ package core
 
 import (
 	"fmt"
-	"libmakercad/third_party/occt"
+
+	"github.com/marcuswu/gooccwrapper/brepbuilderapi"
+	"github.com/marcuswu/gooccwrapper/geom"
 
 	"github.com/marcuswu/dlineate"
 )
@@ -15,18 +17,22 @@ type Line struct {
 	IsConstruction bool
 }
 
+func (l *Line) isConstruction() bool {
+	return l.IsConstruction
+}
+
 func (l *Line) getElement() *dlineate.Element {
 	return &l.Element
 }
 
 func (l *Line) Horizontal() *Line {
-	l.solver.Horizontal(l.Start, l.End)
+	l.solver.HorizontalLine(l)
 
 	return l
 }
 
 func (l *Line) Vertical() *Line {
-	l.solver.Vertical(l.Start, l.End)
+	l.solver.VerticalLine(l)
 
 	return l
 }
@@ -49,8 +55,9 @@ func (l *Line) Angle(other *Line, angle float64) *Line {
 	return l
 }
 
-func (l *Line) MakeEdge() occt.TopoDS_Edge {
-	return nil
+func (l *Line) MakeEdge() *Edge {
+	segment := geom.MakeSegment(l.Start.Convert(), l.End.Convert())
+	return &Edge{brepbuilderapi.NewMakeEdge(segment).ToTopoDSEdge()}
 }
 
 func (l *Line) String() string {
