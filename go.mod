@@ -6,7 +6,7 @@ toolchain go1.21.0
 
 require (
 	github.com/marcuswu/dlineate v0.0.0-20221112003328-59a62ccacbfa
-	github.com/marcuswu/gooccwrapper v0.0.2-0.20230914173626-047cae4bd037
+	github.com/marcuswu/gooccwrapper v0.0.2-0.20230915181700-036db121a30e
 )
 
 require (

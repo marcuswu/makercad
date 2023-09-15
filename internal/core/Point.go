@@ -15,6 +15,26 @@ type Point struct {
 	IsConstruction bool
 }
 
+func (p *Point) GetX() float64 {
+	return p.X
+}
+
+func (p *Point) GetY() float64 {
+	return p.Y
+}
+
+func (p *Point) GetZ() float64 {
+	return 0.0
+}
+
+func (p *Point) SetX(x float64) {
+	p.X = x
+}
+
+func (p *Point) SetY(y float64) {
+	p.Y = y
+}
+
 func (p *Point) isConstruction() bool {
 	return p.IsConstruction
 }

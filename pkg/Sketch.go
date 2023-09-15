@@ -1,10 +1,10 @@
 package MakerCad
 
-import . "libmakercad/internal/core"
+import "libmakercad/internal/core"
 
 // TODO: Use SketchSolver interface -- provide external facing api
 type Sketch struct {
-	sketch SketchSolver
+	sketch core.SketchSolver
 	// origin Point
 }
 

@@ -7,3 +7,7 @@
 - [x] Build out sketch elements
 - [x] Complete SketchSolver interface in DlineateSolver
 - [ ] Build External API
+  - [ ] Walk through Node API for original MakerCad
+  - [ ] Implement interfaces in CadTypes.go
+  - [ ] Add stl / step export
+- [ ] Memory management!

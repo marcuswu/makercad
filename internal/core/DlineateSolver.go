@@ -13,7 +13,6 @@ type DlineateSolver struct {
 	coordinateSystem gp.Ax3
 }
 
-// TODO: figure out how to get the workplane / transform defined
 func NewDlineateSolverFromPlane(plane PlaneParameters) *DlineateSolver {
 	return &DlineateSolver{dlineate.NewSketch(), make([]Entity, 0), plane.ToAx3()}
 }

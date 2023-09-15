@@ -1,13 +1,15 @@
 package MakerCad
 
-// TODO: These either need to be eliminated or updated
+import "libmakercad/internal/core"
+
+// External interfaces to provide
 type Edge interface {
 	IsLine() bool
 	IsCircle() bool
 	IsEllipse() bool
-	GetLine() Line
+	GetLine(core.SketchSolver) Line
 	LineLength() float64
-	GetCircle() Circle
+	GetCircle(core.SketchSolver) Circle
 	CircleRadius() float64
 }
 
@@ -39,7 +41,7 @@ type Line interface {
 	ToString()
 	GetStart() Point
 	GetEnd() Point
-	ToVector() Vector
+	ToVector() core.Vector
 }
 
 type Arc interface {

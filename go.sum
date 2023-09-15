@@ -44,8 +44,8 @@ github.com/klauspost/compress v1.4.1/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0
 github.com/klauspost/cpuid v1.2.0/go.mod h1:Pj4uuM528wm8OyEC2QMXAi2YiTZ96dNQPGgoMS4s3ek=
 github.com/marcuswu/dlineate v0.0.0-20221112003328-59a62ccacbfa h1:jWOuC+GzTVEPmcirSW75FHr4yuHRRWdMZKQJntpUY3w=
 github.com/marcuswu/dlineate v0.0.0-20221112003328-59a62ccacbfa/go.mod h1:Eae22df9JDclWyrJzcw/Q4JOGF65XBD/QKCbCRsFcpM=
-github.com/marcuswu/gooccwrapper v0.0.2-0.20230914173626-047cae4bd037 h1:+VIDQAV40GYnVZDbwPhD7LIFgo4b6UkWhIlqA9edrXU=
-github.com/marcuswu/gooccwrapper v0.0.2-0.20230914173626-047cae4bd037/go.mod h1:KAySvkIotfWEIUuhLdcKBksJjNlrPbe2Wz1JXUxtel8=
+github.com/marcuswu/gooccwrapper v0.0.2-0.20230915181700-036db121a30e h1:XKlvEJFSedCzAhxCMH59+NaaBnUlYtVl41+s5CpYbwU=
+github.com/marcuswu/gooccwrapper v0.0.2-0.20230915181700-036db121a30e/go.mod h1:KAySvkIotfWEIUuhLdcKBksJjNlrPbe2Wz1JXUxtel8=
 github.com/mattn/go-colorable v0.1.12/go.mod h1:u5H1YNBxpqRaxsYJYSkiCWKzEfiAb1Gb520KVy5xxl4=
 github.com/mattn/go-colorable v0.1.13 h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=
 github.com/mattn/go-colorable v0.1.13/go.mod h1:7S9/ev0klgBDR4GtXTXX8a3vIGJpMovkB8vQcUbaXHg=
