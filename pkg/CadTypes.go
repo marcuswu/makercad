@@ -3,6 +3,30 @@ package MakerCad
 import "libmakercad/internal/core"
 
 // External interfaces to provide
+// TODO: Fill out parameters for Face methods
+type Face interface {
+	HasSketchEdge(Edge) bool
+	IsAlignedNormal() bool
+	IsConical() bool
+	IsCylindrical() bool
+	IsNormalAngle() bool
+	IsOnPlane() bool
+	IsOpposingNormal() bool
+	IsPlanar() bool
+	IsSame() bool
+	IsInDirection() bool
+	DistanceAlong() float64
+	DistanceFrom() float64
+	Edges() []Edge
+	Revolve() Shape
+	Extrude() Shape
+	GetPlane() core.PlaneParameters
+}
+
+type Shape interface {
+	Faces() []Face
+}
+
 type Edge interface {
 	IsLine() bool
 	IsCircle() bool
