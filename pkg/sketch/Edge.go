@@ -1,4 +1,4 @@
-package core
+package sketch
 
 import (
 	"github.com/marcuswu/gooccwrapper/brepadapter"
@@ -8,30 +8,30 @@ import (
 	"github.com/marcuswu/gooccwrapper/topods"
 )
 
-type edger interface {
-	MakeEdge() *Edge
+type Edge struct {
+	Edge topods.Edge
 }
 
-type Edge struct {
-	edge topods.Edge
+func NewEdgeFromRef(shape topods.Shape) *Edge {
+	return &Edge{topods.NewEdgeFromRef(topods.TopoDSEdge(shape.Shape))}
 }
 
 func (e *Edge) IsLine() bool {
-	curve := brepadapter.NewCurve(e.edge)
+	curve := brepadapter.NewCurve(e.Edge)
 	return curve.IsLine()
 }
 
 func (e *Edge) IsCircle() bool {
-	curve := brepadapter.NewCurve(e.edge)
+	curve := brepadapter.NewCurve(e.Edge)
 	return curve.IsCircle()
 }
 
 func (e *Edge) IsEllipse() bool {
-	curve := brepadapter.NewCurve(e.edge)
+	curve := brepadapter.NewCurve(e.Edge)
 	return curve.IsEllipse()
 }
 
-func (e *Edge) projectPointToSketch(solver SketchSolver, point gp.Pnt) *Point {
+func (e *Edge) projectPointToSketch(solver SketchSolver, point gp.Pnt) (float64, float64) {
 	origin := solver.CoordinateSystem().Location()
 	originDir := gp.NewDir(origin.X(), origin.Y(), origin.Z())
 	pointDir := gp.NewDirVec(gp.NewVec(point.X(), point.Y(), point.Z()))
@@ -39,7 +39,7 @@ func (e *Edge) projectPointToSketch(solver SketchSolver, point gp.Pnt) *Point {
 	v := solver.CoordinateSystem().YDirection()
 	x := u.Dot(pointDir) - u.Dot(originDir)
 	y := v.Dot(pointDir) - u.Dot(originDir)
-	return solver.CreatePoint(x, y)
+	return x, y
 }
 
 func (e *Edge) GetLine(solver SketchSolver) *Line {
@@ -47,13 +47,13 @@ func (e *Edge) GetLine(solver SketchSolver) *Line {
 		return nil
 	}
 
-	ex := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(&e.edge)), topexp.Vertex)
-	start := e.projectPointToSketch(solver, breptool.Pnt(topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape))))
+	ex := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(&e.Edge)), topexp.Vertex)
+	startX, startY := e.projectPointToSketch(solver, breptool.Pnt(topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape))))
 	ex.Next()
-	end := e.projectPointToSketch(solver, breptool.Pnt(topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape))))
+	endX, endY := e.projectPointToSketch(solver, breptool.Pnt(topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape))))
 
-	line := solver.CreateLine(start, end)
-	line.IsConstruction = true
+	line := solver.CreateLine(startX, startY, endX, endY)
+	solver.MakeFixed(line)
 	return line
 }
 
@@ -62,7 +62,7 @@ func (e *Edge) LineLength() float64 {
 		return 0.0
 	}
 
-	ex := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(&e.edge)), topexp.Vertex)
+	ex := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(&e.Edge)), topexp.Vertex)
 	start := breptool.Pnt(topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape)))
 	ex.Next()
 	end := breptool.Pnt(topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape)))
@@ -75,13 +75,13 @@ func (e *Edge) GetCircle(solver SketchSolver) *Circle {
 		return nil
 	}
 
-	curve := brepadapter.NewCurve(e.edge)
+	curve := brepadapter.NewCurve(e.Edge)
 	circle := curve.ToCircle()
-	center := e.projectPointToSketch(solver, circle.Location())
+	centerX, centerY := e.projectPointToSketch(solver, circle.Location())
 	radius := circle.Radius()
 
-	circ := solver.CreateCircle(center, radius)
-	circ.IsConstruction = true
+	circ := solver.CreateCircle(centerX, centerY, radius)
+	solver.MakeFixed(circ)
 	return circ
 }
 
@@ -90,7 +90,7 @@ func (e *Edge) CircleRadius() float64 {
 		return 0.0
 	}
 
-	curve := brepadapter.NewCurve(e.edge)
+	curve := brepadapter.NewCurve(e.Edge)
 	circle := curve.ToCircle()
 
 	return circle.Radius()

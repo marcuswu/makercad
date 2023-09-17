@@ -1,4 +1,4 @@
-package core
+package sketch
 
 import "github.com/marcuswu/gooccwrapper/gp"
 
@@ -8,11 +8,13 @@ import "github.com/marcuswu/gooccwrapper/gp"
  */
 type SketchSolver interface {
 	//createSketch(PlaneParameters) Sketch2D
+	CoordinateSystem() gp.Ax3
+	Origin() *Point
 	// LookupEntity(uint) Entity
-	CreatePoint(float64, float64) *Point
-	CreateLine(*Point, *Point) *Line
-	CreateCircle(*Point, float64) *Circle
-	CreateArc(*Point, *Point, *Point) *Arc
+	CreatePoint(x float64, y float64) *Point
+	CreateLine(startX float64, startY float64, endX float64, endY float64) *Line
+	CreateCircle(centerX float64, centerY float64, radius float64) *Circle
+	CreateArc(centerX float64, centerY float64, startX float64, startY float64, endX float64, endY float64) *Arc
 	// CreateDistance(float64) *Distance
 	/*
 		// These create fixed entities not solved for
@@ -37,8 +39,8 @@ type SketchSolver interface {
 	LineLength(*Line, float64)
 	Equal(Entity, Entity)
 	CurveDiameter(Entity, float64)
-	CoordinateSystem() gp.Ax3
+	MakeFixed(Entity)
 	Transform() gp.Trsf
 	Solve()
-	ToFace() *Face
+	Entities() []Entity
 }

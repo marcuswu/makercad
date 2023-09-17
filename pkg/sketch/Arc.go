@@ -1,4 +1,4 @@
-package core
+package sketch
 
 import (
 	"github.com/marcuswu/dlineate"
@@ -13,11 +13,11 @@ type Arc struct {
 	Center         *Point
 	Start          *Point
 	End            *Point
-	IsConstruction bool
+	isConstruction bool
 }
 
-func (a *Arc) isConstruction() bool {
-	return a.IsConstruction
+func (a *Arc) IsConstruction() bool {
+	return a.isConstruction
 }
 
 func (a *Arc) getElement() *dlineate.Element {

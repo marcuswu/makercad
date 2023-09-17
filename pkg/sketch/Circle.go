@@ -1,4 +1,4 @@
-package core
+package sketch
 
 import (
 	"github.com/marcuswu/dlineate"
@@ -12,11 +12,11 @@ type Circle struct {
 	solver         SketchSolver
 	Center         *Point
 	Radius         float64
-	IsConstruction bool
+	isConstruction bool
 }
 
-func (c *Circle) isConstruction() bool {
-	return c.IsConstruction
+func (c *Circle) IsConstruction() bool {
+	return c.isConstruction
 }
 
 func (c *Circle) getElement() *dlineate.Element {

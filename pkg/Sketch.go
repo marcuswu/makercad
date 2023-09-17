@@ -1,18 +1,33 @@
-package MakerCad
+package makercad
 
-import "libmakercad/internal/core"
+import "libmakercad/pkg/sketch"
 
-// TODO: Use SketchSolver interface -- provide external facing api
 type Sketch struct {
-	sketch core.SketchSolver
-	// origin Point
+	solver sketch.SketchSolver
 }
 
 // No constructors -- Sketches should be created via MakerCad
 
-func Solve() {
-
+func (s *Sketch) Solve() {
+	s.solver.Solve()
 }
 
-// TODO: Origin, SketchSolver getters
-// TODO: arc, circle, line, point methods
+func (s *Sketch) Origin() *sketch.Point {
+	return s.solver.Origin()
+}
+
+func (s *Sketch) Arc(centerX float64, centerY float64, startX float64, startY float64, endX float64, endY float64) *sketch.Arc {
+	return s.solver.CreateArc(centerX, centerY, startX, startY, endX, endY)
+}
+
+func (s *Sketch) Circle(centerX float64, centerY float64, diameter float64) *sketch.Circle {
+	return s.solver.CreateCircle(centerX, centerY, diameter/2.0)
+}
+
+func (s *Sketch) Line(startX float64, startY float64, endX float64, endY float64) *sketch.Line {
+	return s.solver.CreateLine(startX, startY, endX, endY)
+}
+
+func (s *Sketch) Point(x float64, y float64) *sketch.Point {
+	return s.solver.CreatePoint(x, y)
+}

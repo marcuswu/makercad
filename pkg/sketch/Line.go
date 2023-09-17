@@ -1,4 +1,4 @@
-package core
+package sketch
 
 import (
 	"fmt"
@@ -14,11 +14,11 @@ type Line struct {
 	solver         SketchSolver
 	Start          *Point
 	End            *Point
-	IsConstruction bool
+	isConstruction bool
 }
 
-func (l *Line) isConstruction() bool {
-	return l.IsConstruction
+func (l *Line) IsConstruction() bool {
+	return l.isConstruction
 }
 
 func (l *Line) getElement() *dlineate.Element {
@@ -38,6 +38,9 @@ func (l *Line) Vertical() *Line {
 }
 
 func (l *Line) Length(length float64) *Line {
+	if l.End == nil || l.Start == nil {
+		return l
+	}
 	l.solver.Distance(l.Start, l.End, length)
 
 	return l

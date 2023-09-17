@@ -1,53 +1,69 @@
-package core
+package sketch
 
 import (
 	"github.com/marcuswu/dlineate"
-	"github.com/marcuswu/gooccwrapper/brepbuilderapi"
 	"github.com/marcuswu/gooccwrapper/gp"
-	"github.com/marcuswu/gooccwrapper/topods"
 )
 
 type DlineateSolver struct {
 	system           *dlineate.Sketch
 	entities         []Entity
 	coordinateSystem gp.Ax3
+	origin           *Point
+	XAxis            *Line
+	YAxis            *Line
 }
 
-func NewDlineateSolverFromPlane(plane PlaneParameters) *DlineateSolver {
-	return &DlineateSolver{dlineate.NewSketch(), make([]Entity, 0), plane.ToAx3()}
+func NewDlineateSolver(planer Planer) *DlineateSolver {
+	solver := &DlineateSolver{dlineate.NewSketch(), make([]Entity, 0), planer.Plane(), nil, nil, nil}
+	solver.origin = &Point{Element: *solver.system.Origin, solver: solver, X: 0, Y: 0, isConstruction: true}
+	solver.XAxis = &Line{Element: *solver.system.XAxis, solver: solver, Start: nil, End: nil, isConstruction: true}
+	solver.YAxis = &Line{Element: *solver.system.YAxis, solver: solver, Start: nil, End: nil, isConstruction: true}
+	return solver
 }
 
-func NewDlineateSolverFromFace(face *Face) *DlineateSolver {
-	return &DlineateSolver{dlineate.NewSketch(), make([]Entity, 0), face.Plane()}
+func (s *DlineateSolver) Entities() []Entity {
+	return s.entities
+}
+
+func (s *DlineateSolver) Origin() *Point {
+	return s.origin
 }
 
 func (s *DlineateSolver) CreatePoint(x float64, y float64) *Point {
-	entity := &Point{Element: *s.system.AddPoint(x, y), solver: s, X: x, Y: y, IsConstruction: false}
+	entity := &Point{Element: *s.system.AddPoint(x, y), solver: s, X: x, Y: y, isConstruction: false}
 	s.entities = append(s.entities, entity)
 	return entity
 }
 
-func (s *DlineateSolver) CreateLine(p1 *Point, p2 *Point) *Line {
-	entity := &Line{Element: *s.system.AddLine(p1.X, p1.Y, p2.X, p2.Y), solver: s, Start: p1, End: p2, IsConstruction: false}
+func (s *DlineateSolver) PointFromRef(ref *dlineate.Element) *Point {
+	return &Point{Element: *ref, solver: s, X: ref.Values(s.system)[0], Y: ref.Values(s.system)[1], isConstruction: false}
+}
+
+func (s *DlineateSolver) CreateLine(p1X float64, p1Y float64, p2X float64, p2Y float64) *Line {
+	entity := &Line{Element: *s.system.AddLine(p1X, p1Y, p2X, p2Y), solver: s, isConstruction: false}
+	entity.Start = s.PointFromRef(entity.Element.Start())
+	entity.End = s.PointFromRef(entity.Element.End())
 	s.entities = append(s.entities, entity)
 	return entity
 }
 
-func (s *DlineateSolver) CreateCircle(p *Point, r float64) *Circle {
-	entity := &Circle{Element: *s.system.AddCircle(p.X, p.Y, r), solver: s, Center: p, Radius: r, IsConstruction: false}
+func (s *DlineateSolver) CreateCircle(centerX float64, centerY float64, r float64) *Circle {
+	entity := &Circle{Element: *s.system.AddCircle(centerX, centerY, r), solver: s, Radius: r, isConstruction: false}
+	entity.Center = s.PointFromRef(entity.Element.Center())
 	s.entities = append(s.entities, entity)
 	return entity
 }
 
-func (s *DlineateSolver) CreateArc(center *Point, start *Point, end *Point) *Arc {
+func (s *DlineateSolver) CreateArc(centerX float64, centerY float64, startX float64, startY float64, endX float64, endY float64) *Arc {
 	entity := &Arc{
-		Element:        *s.system.AddArc(center.X, center.Y, start.X, start.Y, end.X, end.Y),
+		Element:        *s.system.AddArc(centerX, centerY, startX, startY, endX, endY),
 		solver:         s,
-		Center:         center,
-		Start:          start,
-		End:            end,
-		IsConstruction: false,
+		isConstruction: false,
 	}
+	entity.Start = s.PointFromRef(entity.Element.Start())
+	entity.Center = s.PointFromRef(entity.Element.Center())
+	entity.End = s.PointFromRef(entity.Element.End())
 	s.entities = append(s.entities, entity)
 	return entity
 }
@@ -84,12 +100,14 @@ func (s *DlineateSolver) PointVerticalDistance(p *Point, e Entity, d float64) {
 	pe, ok := e.(*Point)
 	if !ok {
 		pe = s.CreatePoint(0, 0)
-		pe.IsConstruction = true
+		s.system.AddCoincidentConstraint(pe.getElement(), e.getElement())
+		pe.isConstruction = true
 	}
-	cl := s.CreateLine(p, pe)
-	cl.IsConstruction = true
+	cl := s.CreateLine(p.X, p.Y, pe.X, pe.Y)
+	cl.isConstruction = true
+	s.system.AddCoincidentConstraint(p.getElement(), cl.getElement())
+	s.system.AddCoincidentConstraint(pe.getElement(), cl.getElement())
 	s.system.AddVerticalConstraint(cl.getElement())
-	s.system.AddDistanceConstraint(pe.getElement(), e.getElement(), 0)
 	s.system.AddDistanceConstraint(p.getElement(), e.getElement(), d)
 }
 
@@ -97,12 +115,14 @@ func (s *DlineateSolver) PointHorizontalDistance(p *Point, e Entity, d float64) 
 	pe, ok := e.(*Point)
 	if !ok {
 		pe = s.CreatePoint(0, 0)
-		pe.IsConstruction = true
+		s.system.AddCoincidentConstraint(pe.getElement(), e.getElement())
+		pe.isConstruction = true
 	}
-	cl := s.CreateLine(p, pe)
-	cl.IsConstruction = true
+	cl := s.CreateLine(p.X, p.Y, pe.X, pe.Y)
+	cl.isConstruction = true
+	s.system.AddCoincidentConstraint(p.getElement(), cl.getElement())
+	s.system.AddCoincidentConstraint(pe.getElement(), cl.getElement())
 	s.system.AddHorizontalConstraint(cl.getElement())
-	s.system.AddDistanceConstraint(pe.getElement(), e.getElement(), 0)
 	s.system.AddDistanceConstraint(p.getElement(), e.getElement(), d)
 }
 
@@ -110,11 +130,13 @@ func (s *DlineateSolver) PointProjectedDistance(p *Point, e Entity, d float64) {
 	pe, ok := e.(*Point)
 	if !ok {
 		pe = s.CreatePoint(0, 0)
-		pe.IsConstruction = true
+		s.system.AddCoincidentConstraint(pe.getElement(), e.getElement())
+		pe.isConstruction = true
 	}
-	cl := s.CreateLine(p, pe)
-	cl.IsConstruction = true
-	s.system.AddDistanceConstraint(pe.getElement(), e.getElement(), 0)
+	cl := s.CreateLine(p.X, p.Y, pe.X, pe.Y)
+	cl.isConstruction = true
+	s.system.AddCoincidentConstraint(p.getElement(), cl.getElement())
+	s.system.AddCoincidentConstraint(pe.getElement(), cl.getElement())
 	s.system.AddPerpendicularConstraint(cl.getElement(), e.getElement())
 	s.system.AddDistanceConstraint(p.getElement(), e.getElement(), d)
 }
@@ -140,8 +162,10 @@ func (s *DlineateSolver) HorizontalLine(l *Line) {
 }
 
 func (s *DlineateSolver) HorizontalPoints(p1 *Point, p2 *Point) {
-	hl := s.CreateLine(p1, p2)
-	hl.IsConstruction = true
+	hl := s.CreateLine(p1.X, p1.Y, p2.X, p2.Y)
+	hl.isConstruction = true
+	s.system.AddCoincidentConstraint(hl.getElement(), p1.getElement())
+	s.system.AddCoincidentConstraint(hl.getElement(), p2.getElement())
 	s.system.AddHorizontalConstraint(hl.getElement())
 }
 
@@ -150,9 +174,11 @@ func (s *DlineateSolver) VerticalLine(l *Line) {
 }
 
 func (s *DlineateSolver) VerticalPoints(p1 *Point, p2 *Point) {
-	hl := s.CreateLine(p1, p2)
-	hl.IsConstruction = true
-	s.system.AddVerticalConstraint(hl.getElement())
+	vl := s.CreateLine(p1.X, p1.Y, p2.X, p2.Y)
+	vl.isConstruction = true
+	s.system.AddCoincidentConstraint(vl.getElement(), p1.getElement())
+	s.system.AddCoincidentConstraint(vl.getElement(), p2.getElement())
+	s.system.AddVerticalConstraint(vl.getElement())
 }
 
 func (s *DlineateSolver) LineLength(l *Line, d float64) {
@@ -165,18 +191,23 @@ func (s *DlineateSolver) Equal(e1 Entity, e2 Entity) {
 
 func (s *DlineateSolver) CurveDiameter(e Entity, d float64) {
 	if a, ok := e.(*Arc); ok {
-		s.system.AddDistanceConstraint(a.Center.getElement(), a.Start.getElement(), d)
+		s.system.AddDistanceConstraint(a.Center.getElement(), a.Start.getElement(), d/2)
 		return
 	}
 	c, ok := e.(*Circle)
 	if !ok {
 		return
 	}
-	s.system.AddDistanceConstraint(c.Center.getElement(), nil, d)
+	// This requires that the circle
+	s.system.AddDistanceConstraint(c.getElement(), nil, d/2)
 }
 
 func (s *DlineateSolver) CoordinateSystem() gp.Ax3 {
 	return s.coordinateSystem
+}
+
+func (s *DlineateSolver) MakeFixed(e Entity) {
+	s.system.MakeFixed(e.getElement())
 }
 
 func (s *DlineateSolver) Transform() gp.Trsf {
@@ -188,22 +219,4 @@ func (s *DlineateSolver) Transform() gp.Trsf {
 
 func (s *DlineateSolver) Solve() {
 	s.system.Solve()
-}
-
-func (s *DlineateSolver) ToFace() *Face {
-	wires := make([]topods.Wire, 0)
-	for i := range s.entities {
-		entity := s.entities[i]
-		if entity.isConstruction() {
-			continue
-		}
-		wires = append(wires, brepbuilderapi.NewMakeWireWithEdge(entity.MakeEdge().edge).ToTopoDSWire())
-	}
-
-	combined := brepbuilderapi.NewMakeWire()
-	for i := range wires {
-		combined.AddWire(wires[i])
-	}
-
-	return &Face{brepbuilderapi.NewMakeFace(combined.ToTopoDSWire()).ToTopoDSFace()}
 }

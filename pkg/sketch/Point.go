@@ -1,4 +1,4 @@
-package core
+package sketch
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ type Point struct {
 	solver         SketchSolver
 	X              float64
 	Y              float64
-	IsConstruction bool
+	isConstruction bool
 }
 
 func (p *Point) GetX() float64 {
@@ -35,8 +35,8 @@ func (p *Point) SetY(y float64) {
 	p.Y = y
 }
 
-func (p *Point) isConstruction() bool {
-	return p.IsConstruction
+func (p *Point) IsConstruction() bool {
+	return p.isConstruction
 }
 
 func (p *Point) getElement() *dlineate.Element {

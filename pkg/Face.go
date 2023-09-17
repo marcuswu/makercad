@@ -1,11 +1,13 @@
-package core
+package makercad
 
 import (
 	"libmakercad/internal/utils"
+	"libmakercad/pkg/sketch"
 	"math"
 
 	"github.com/marcuswu/gooccwrapper/brepadapter"
 	"github.com/marcuswu/gooccwrapper/brepalgoapi"
+	"github.com/marcuswu/gooccwrapper/brepbuilderapi"
 	"github.com/marcuswu/gooccwrapper/brepgprop"
 	"github.com/marcuswu/gooccwrapper/brepprimapi"
 	"github.com/marcuswu/gooccwrapper/breptool"
@@ -25,6 +27,25 @@ type Face struct {
 	face topods.Face
 }
 
+func NewFace(sketch *Sketch) *Face {
+	wires := make([]topods.Wire, 0)
+	entities := sketch.solver.Entities()
+	for i := range entities {
+		entity := entities[i]
+		if entity.IsConstruction() {
+			continue
+		}
+		wires = append(wires, brepbuilderapi.NewMakeWireWithEdge(entity.MakeEdge().Edge).ToTopoDSWire())
+	}
+
+	combined := brepbuilderapi.NewMakeWire()
+	for i := range wires {
+		combined.AddWire(wires[i])
+	}
+
+	return &Face{brepbuilderapi.NewMakeFace(combined.ToTopoDSWire()).ToTopoDSFace()}
+}
+
 func (f *Face) getCenter() gp.Pnt {
 	shellProps := gprop.NewGProps()
 	brepgprop.SurfaceProperties(topods.NewShapeFromRef(topods.TopoDSShape(f.face.Face)), shellProps, false, false)
@@ -39,19 +60,19 @@ func (f *Face) getCenter() gp.Pnt {
 func (f *Face) Plane() gp.Ax3 {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
-		return NewPlaneParameters().ToAx3()
+		return sketch.NewPlaneParameters().Plane()
 	}
 	normal := surface.Plane().Axis().Direction()
 	location := f.getCenter()
-	yDir := surface.Plane().Position().YDirection()
+	xDir := surface.Plane().Position().XDirection()
 
-	facePlane := NewPlaneParameters(
-		gp.NewVec(location.X(), location.Y(), location.Z()),
-		gp.NewVec(normal.X(), normal.Y(), normal.Z()),
-		gp.NewVec(yDir.X(), yDir.Y(), yDir.Z()),
+	facePlane := sketch.NewPlaneParametersFromVectors(
+		sketch.NewVectorFromValues(location.X(), location.Y(), location.Z()),
+		sketch.NewVectorFromValues(normal.X(), normal.Y(), normal.Z()),
+		sketch.NewVectorFromValues(xDir.X(), xDir.Y(), xDir.Z()),
 	)
 
-	return facePlane.ToAx3()
+	return facePlane.Plane()
 }
 
 func (f *Face) Normal() gp.Dir {
@@ -61,12 +82,12 @@ func (f *Face) Normal() gp.Dir {
 	return props.Normal()
 }
 
-func (f *Face) Revolve(axis *Line, angle float64) *CadOperation {
+func (f *Face) Revolve(axis *sketch.Line, angle float64) *CadOperation {
 	list := toptools.NewListOfShape()
 	return f.RevolveMerging(axis, angle, MergeTypeNew, list)
 }
 
-func (f *Face) RevolveMerging(axis *Line, angle float64, merge MergeType, list toptools.ListOfShape) *CadOperation {
+func (f *Face) RevolveMerging(axis *sketch.Line, angle float64, merge MergeType, list toptools.ListOfShape) *CadOperation {
 	if !f.IsPlanar() {
 		return nil
 	}
@@ -165,7 +186,7 @@ func (f *Face) IsAlignedWithFace(other *Face) bool {
 	return normal.IsParallel(otherNormal)
 }
 
-func (f *Face) IsAlignedWithPlane(plane *PlaneParameters) bool {
+func (f *Face) IsAlignedWithPlane(plane *sketch.PlaneParameters) bool {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
 		return false
@@ -197,7 +218,7 @@ func (f *Face) IsNormalAngle(other *Face, angle float64, tolerance float64) bool
 	) < tolerance
 }
 
-func (f *Face) IsOnPlane(plane *PlaneParameters) bool {
+func (f *Face) IsOnPlane(plane *sketch.PlaneParameters) bool {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
 		return false
@@ -261,14 +282,14 @@ func (f *Face) DistanceFrom(x float64, y float64, z float64) float64 {
 	return location.Distance(gp.NewPnt(x, y, z))
 }
 
-func (f *Face) Edges() []Edge {
-	edges := make([]Edge, 0)
+func (f *Face) Edges() []sketch.Edge {
+	edges := make([]sketch.Edge, 0)
 	explorer := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(f.face.Face)), topexp.Edge)
 	for ; explorer.More(); explorer.Next() {
 		if explorer.Depth() > 1 {
 			continue
 		}
-		edges = append(edges, Edge{topods.NewEdgeFromRef(topods.TopoDSEdge(explorer.Current().Shape))})
+		edges = append(edges, *sketch.NewEdgeFromRef(explorer.Current()))
 	}
 
 	return edges
