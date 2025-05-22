@@ -20,6 +20,10 @@ func (a *Arc) IsConstruction() bool {
 	return a.isConstruction
 }
 
+func (a *Arc) SetConstruction(isConstruction bool) {
+	a.isConstruction = isConstruction
+}
+
 func (a *Arc) getElement() *dlineate.Element {
 	return &a.Element
 }

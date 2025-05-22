@@ -12,4 +12,5 @@ type Entity interface {
 	getElement() *dlineate.Element
 	UpdateFromValues()
 	IsConstruction() bool
+	SetConstruction(bool)
 }

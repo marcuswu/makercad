@@ -19,6 +19,10 @@ func (c *Circle) IsConstruction() bool {
 	return c.isConstruction
 }
 
+func (c *Circle) SetConstruction(isConstruction bool) {
+	c.isConstruction = isConstruction
+}
+
 func (c *Circle) getElement() *dlineate.Element {
 	return &c.Element
 }

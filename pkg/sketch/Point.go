@@ -40,6 +40,10 @@ func (p *Point) IsConstruction() bool {
 	return p.isConstruction
 }
 
+func (p *Point) SetConstruction(isConstruction bool) {
+	p.isConstruction = isConstruction
+}
+
 func (p *Point) getElement() *dlineate.Element {
 	return &p.Element
 }

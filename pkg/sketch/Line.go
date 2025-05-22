@@ -21,6 +21,10 @@ func (l *Line) IsConstruction() bool {
 	return l.isConstruction
 }
 
+func (l *Line) SetConstruction(isConstruction bool) {
+	l.isConstruction = isConstruction
+}
+
 func (l *Line) getElement() *dlineate.Element {
 	return &l.Element
 }
