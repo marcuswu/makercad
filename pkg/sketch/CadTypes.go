@@ -2,7 +2,8 @@ package sketch
 
 import (
 	"fmt"
-	"libmakercad/internal/utils"
+
+	"github.com/marcuswu/libmakercad/internal/utils"
 
 	"github.com/marcuswu/gooccwrapper/gp"
 )

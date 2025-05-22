@@ -1,4 +1,4 @@
-module libmakercad
+module github.com/marcuswu/libmakercad
 
 go 1.21
 

@@ -1,9 +1,10 @@
 package makercad
 
 import (
-	"libmakercad/internal/utils"
-	"libmakercad/pkg/sketch"
 	"math"
+
+	"github.com/marcuswu/libmakercad/internal/utils"
+	"github.com/marcuswu/libmakercad/pkg/sketch"
 
 	"github.com/marcuswu/gooccwrapper/brepadapter"
 	"github.com/marcuswu/gooccwrapper/brepalgoapi"

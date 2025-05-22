@@ -2,7 +2,8 @@ package makercad
 
 import (
 	"errors"
-	"libmakercad/pkg/sketch"
+
+	"github.com/marcuswu/libmakercad/pkg/sketch"
 
 	"github.com/marcuswu/gooccwrapper/brep"
 	"github.com/marcuswu/gooccwrapper/brepmesh"

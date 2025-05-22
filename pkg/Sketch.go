@@ -1,6 +1,6 @@
 package makercad
 
-import "libmakercad/pkg/sketch"
+import "github.com/marcuswu/libmakercad/pkg/sketch"
 
 type Sketch struct {
 	solver sketch.SketchSolver

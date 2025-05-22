@@ -1,10 +1,8 @@
 package main
 
-import makercad "libmakercad/pkg"
+import makercad "github.com/marcuswu/libmakercad/pkg"
 
 func main() {
-
-	// This doesn't work -- compare what this ends up doing w/ what the constraint solver examples do
 
 	cad := makercad.NewMakerCad()
 	sketch := cad.Sketch(cad.TopPlane)

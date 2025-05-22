@@ -1,7 +1,7 @@
 package main
 
 import (
-	makercad "libmakercad/pkg"
+	makercad "github.com/marcuswu/libmakercad/pkg"
 )
 
 func main() {
