@@ -8,8 +8,8 @@ toolchain go1.21.0
 // replace github.com/marcuswu/gooccwrapper => /home/mwu/src/gooccwrapper
 
 require (
-	github.com/marcuswu/dlineate v0.1.1
-	github.com/marcuswu/gooccwrapper v0.1.0
+	github.com/marcuswu/dlineate v0.1.2
+	github.com/marcuswu/gooccwrapper v0.1.2
 )
 
 require (
