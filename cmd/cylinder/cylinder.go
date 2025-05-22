@@ -16,7 +16,7 @@ func main() {
 	face := makercad.NewFace(sketch)
 	cylinderOp := face.Extrude(10)
 
-	exports := make(makercad.ListOfShape, 1)
+	exports := make(makercad.ListOfShape, 0, 1)
 	exports = append(exports, cylinderOp.Shape())
 
 	cad.ExportStl("cylinder.stl", exports, makercad.QualityHigh)

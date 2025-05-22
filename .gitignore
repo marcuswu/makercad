@@ -5,6 +5,10 @@
 *.so
 *.dylib
 
+# Files generated from examples
+*.stl
+*.dot
+
 # Test binary, built with `go test -c`
 *.test
 

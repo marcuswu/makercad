@@ -12,7 +12,6 @@ import (
 	"github.com/marcuswu/gooccwrapper/brepprimapi"
 	"github.com/marcuswu/gooccwrapper/breptool"
 	"github.com/marcuswu/gooccwrapper/breptools"
-	"github.com/marcuswu/gooccwrapper/geom"
 	"github.com/marcuswu/gooccwrapper/geomabs"
 	"github.com/marcuswu/gooccwrapper/geomadapter"
 	"github.com/marcuswu/gooccwrapper/geomlprop"
@@ -35,7 +34,10 @@ func NewFace(sketch *Sketch) *Face {
 		if entity.IsConstruction() {
 			continue
 		}
-		wires = append(wires, brepbuilderapi.NewMakeWireWithEdge(entity.MakeEdge().Edge).ToTopoDSWire())
+		edge := entity.MakeEdge()
+		if edge != nil {
+			wires = append(wires, brepbuilderapi.NewMakeWireWithEdge(edge.Edge).ToTopoDSWire())
+		}
 	}
 
 	combined := brepbuilderapi.NewMakeWire()
@@ -77,7 +79,7 @@ func (f *Face) Plane() gp.Ax3 {
 
 func (f *Face) Normal() gp.Dir {
 	umin, _, vmin, _ := breptools.UVBounds(f.face)
-	surface := geom.NewSurfaceFromRef(geom.GeomSurface(&f.face))
+	surface := breptool.Surface(f.face)
 	props := geomlprop.NewSLProps(surface, umin, vmin, 1, 0.01)
 	return props.Normal()
 }
@@ -197,15 +199,21 @@ func (f *Face) IsAlignedWithPlane(plane *sketch.PlaneParameters) bool {
 }
 
 func (f *Face) IsConical() bool {
-	return geomadapter.NewSurface(breptool.Surface(f.face)).IsConical()
+	surf := geomadapter.NewSurface(breptool.Surface(f.face))
+	defer surf.Free()
+	return surf.IsConical()
 }
 
 func (f *Face) IsCylindrical() bool {
-	return geomadapter.NewSurface(breptool.Surface(f.face)).IsCylindrical()
+	surf := geomadapter.NewSurface(breptool.Surface(f.face))
+	defer surf.Free()
+	return surf.IsCylindrical()
 }
 
 func (f *Face) IsPlanar() bool {
-	return geomadapter.NewSurface(breptool.Surface(f.face)).IsPlanar()
+	surf := geomadapter.NewSurface(breptool.Surface(f.face))
+	defer surf.Free()
+	return surf.IsPlanar()
 }
 
 func (f *Face) IsNormalAngle(other *Face, angle float64, tolerance float64) bool {

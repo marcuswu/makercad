@@ -13,6 +13,7 @@ type Point struct {
 	X              float64
 	Y              float64
 	isConstruction bool
+	converted      gp.Pnt
 }
 
 func (p *Point) GetX() float64 {
@@ -82,7 +83,16 @@ func (p *Point) ToString() string {
 }
 
 func (p *Point) Convert() gp.Pnt {
-	return gp.NewPnt(p.X, p.Y, 0).Transformed(p.solver.Transform())
+	if p.converted.Pnt == nil {
+		p.converted = gp.NewPnt(p.X, p.Y, 0).Transformed(p.solver.Transform())
+	}
+	return p.converted
+}
+
+func (p *Point) UpdateFromValues() {
+	values := p.Element.Values()
+	p.X = values[0]
+	p.Y = values[1]
 }
 
 func (p *Point) MakeEdge() *Edge {

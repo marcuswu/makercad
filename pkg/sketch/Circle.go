@@ -35,9 +35,16 @@ func (c *Circle) Equal(other *Circle) *Circle {
 	return c
 }
 
+func (c *Circle) UpdateFromValues() {
+	values := c.Element.Values()
+	c.Center.UpdateFromValues()
+	c.Radius = values[2]
+}
+
 func (c *Circle) MakeEdge() *Edge {
-	center := gp.NewPnt(c.Center.X, c.Center.Y, 0.0)
+	centerPoint := gp.NewPnt(c.Center.X, c.Center.Y, 0.0)
 	radius := c.Radius
+	center := gp.NewAx2(centerPoint, c.solver.CoordinateSystem().Direction())
 	circle := geom.MakeCircle(center, radius)
 	return &Edge{brepbuilderapi.NewMakeEdge(circle).ToTopoDSEdge()}
 }

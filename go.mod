@@ -4,9 +4,12 @@ go 1.21
 
 toolchain go1.21.0
 
+replace github.com/marcuswu/dlineate => /home/mwu/src/dlineate
+replace github.com/marcuswu/gooccwrapper => /home/mwu/src/gooccwrapper
+
 require (
-	github.com/marcuswu/dlineate v0.0.0-20230917134017-d74aa316d076
-	github.com/marcuswu/gooccwrapper v0.0.2-0.20230916200324-895b0d228e58
+	github.com/marcuswu/dlineate v0.1.1
+	github.com/marcuswu/gooccwrapper v0.1.0
 )
 
 require (

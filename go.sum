@@ -41,10 +41,16 @@ github.com/marcuswu/dlineate v0.0.0-20230917125633-50123b024bf1 h1:qrVKPwV97GeP5
 github.com/marcuswu/dlineate v0.0.0-20230917125633-50123b024bf1/go.mod h1:TTYhM8wZCCcy2XSTlqYOQrP+dcUWdh6pK+RBuG1r3ik=
 github.com/marcuswu/dlineate v0.0.0-20230917134017-d74aa316d076 h1:UMu+UESngxVpipPbCBOkccI4k5ACSwfHdC0loGrudow=
 github.com/marcuswu/dlineate v0.0.0-20230917134017-d74aa316d076/go.mod h1:TTYhM8wZCCcy2XSTlqYOQrP+dcUWdh6pK+RBuG1r3ik=
+github.com/marcuswu/dlineate v0.1.0 h1:MjjRcwIMpjO3VEeG7F7UyuZd0mX3GyOSWU1QZewSk0w=
+github.com/marcuswu/dlineate v0.1.0/go.mod h1:/DPO3nYHGPFlmqv8GvIDcOUjkiLc2JocVFBbJu7bAXo=
+github.com/marcuswu/dlineate v0.1.1 h1:O1GRilxD5LvwSrSOdRmJ/JgND/je5LyHn8HaO7NjaFo=
+github.com/marcuswu/dlineate v0.1.1/go.mod h1:/DPO3nYHGPFlmqv8GvIDcOUjkiLc2JocVFBbJu7bAXo=
 github.com/marcuswu/gooccwrapper v0.0.2-0.20230916182955-004923eb682e h1:f5wqvc1hZ+6jhFZCuQVJG+b5uxKpKuxUThPgYkJJncs=
 github.com/marcuswu/gooccwrapper v0.0.2-0.20230916182955-004923eb682e/go.mod h1:KAySvkIotfWEIUuhLdcKBksJjNlrPbe2Wz1JXUxtel8=
 github.com/marcuswu/gooccwrapper v0.0.2-0.20230916200324-895b0d228e58 h1:9XI5rwNKQ1vvLMlLqG1fqjsEu+pPtKL9Lb6y8UGy3Sg=
 github.com/marcuswu/gooccwrapper v0.0.2-0.20230916200324-895b0d228e58/go.mod h1:KAySvkIotfWEIUuhLdcKBksJjNlrPbe2Wz1JXUxtel8=
+github.com/marcuswu/gooccwrapper v0.1.0 h1:ijstrOhVsDftav/f8xIHUooPHngRpS3jw6dxZTUiorw=
+github.com/marcuswu/gooccwrapper v0.1.0/go.mod h1:KAySvkIotfWEIUuhLdcKBksJjNlrPbe2Wz1JXUxtel8=
 github.com/mattn/go-colorable v0.1.12/go.mod h1:u5H1YNBxpqRaxsYJYSkiCWKzEfiAb1Gb520KVy5xxl4=
 github.com/mattn/go-colorable v0.1.13 h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=
 github.com/mattn/go-colorable v0.1.13/go.mod h1:7S9/ev0klgBDR4GtXTXX8a3vIGJpMovkB8vQcUbaXHg=

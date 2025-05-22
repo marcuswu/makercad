@@ -47,3 +47,9 @@ func (a *Arc) MakeEdge() *Edge {
 	arc := geom.MakeArc(circle, start, end, true)
 	return &Edge{brepbuilderapi.NewMakeEdge(arc).ToTopoDSEdge()}
 }
+
+func (a *Arc) UpdateFromValues() {
+	a.Center.UpdateFromValues()
+	a.Start.UpdateFromValues()
+	a.End.UpdateFromValues()
+}

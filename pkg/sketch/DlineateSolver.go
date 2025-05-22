@@ -37,7 +37,7 @@ func (s *DlineateSolver) CreatePoint(x float64, y float64) *Point {
 }
 
 func (s *DlineateSolver) PointFromRef(ref *dlineate.Element) *Point {
-	return &Point{Element: *ref, solver: s, X: ref.Values(s.system)[0], Y: ref.Values(s.system)[1], isConstruction: false}
+	return &Point{Element: *ref, solver: s, X: ref.Values()[0], Y: ref.Values()[1], isConstruction: false}
 }
 
 func (s *DlineateSolver) CreateLine(p1X float64, p1Y float64, p2X float64, p2Y float64) *Line {
@@ -219,4 +219,7 @@ func (s *DlineateSolver) Transform() gp.Trsf {
 
 func (s *DlineateSolver) Solve() {
 	s.system.Solve()
+	for _, e := range s.entities {
+		e.UpdateFromValues()
+	}
 }

@@ -63,6 +63,11 @@ func (l *Line) MakeEdge() *Edge {
 	return &Edge{brepbuilderapi.NewMakeEdge(segment).ToTopoDSEdge()}
 }
 
+func (l *Line) UpdateFromValues() {
+	l.Start.UpdateFromValues()
+	l.End.UpdateFromValues()
+}
+
 func (l *Line) String() string {
-	return fmt.Sprintf("Line: %v to %v", l.Start, l.End)
+	return fmt.Sprintf("Line: %v to %v", l.Start.ToString(), l.End.ToString())
 }
