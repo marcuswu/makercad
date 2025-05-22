@@ -1,9 +1,7 @@
 # libMakerCAD
 
-cd third_party/occt
-swig -I/usr/local/include/opencascade -go -c++ -intgosize 64 libocct.swig
-cd ../planegcs
-swig -I/usr/local/include/planegcs -go -c++ -intgosize 64 libplanegcs.swig
+## Getting Started
+This project relies on my [C wrapper for OpenCascade](https://github.com/marcuswu/occwrapper/). See its [Readme](https://github.com/marcuswu/occwrapper/blob/main/README.md) for installation of its dependencies.
 
 ### Visualizing Constraint Solver Clusters ###
 ```
