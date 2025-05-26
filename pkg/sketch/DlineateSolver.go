@@ -217,9 +217,23 @@ func (s *DlineateSolver) Transform() gp.Trsf {
 	return transform
 }
 
-func (s *DlineateSolver) Solve() {
-	s.system.Solve()
+func (s *DlineateSolver) Solve() error {
+	err := s.system.Solve()
 	for _, e := range s.entities {
 		e.UpdateFromValues()
 	}
+	return err
+}
+
+func (s *DlineateSolver) OverConstrained() []string {
+	constraints := s.system.ConflictingConstraints()
+	ret := make([]string, 0, len(constraints))
+	for _, c := range constraints {
+		ret = append(ret, c.String())
+	}
+	return ret
+}
+
+func (s *DlineateSolver) LogDebug(file string) error {
+	return s.system.ExportGraphViz(file)
 }

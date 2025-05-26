@@ -1,6 +1,8 @@
 package sketch
 
 import (
+	"slices"
+
 	"github.com/marcuswu/gooccwrapper/brepadapter"
 	"github.com/marcuswu/gooccwrapper/breptool"
 	"github.com/marcuswu/gooccwrapper/gp"
@@ -10,6 +12,33 @@ import (
 
 type Edge struct {
 	Edge topods.Edge
+}
+type ListOfEdge []*Edge
+
+type EdgeFilter func(*Edge) bool
+type EdgeSorter func(a, b *Edge) int
+
+func (l ListOfEdge) First(filter EdgeFilter) *Edge {
+	for _, edge := range l {
+		if filter(edge) {
+			return edge
+		}
+	}
+	return nil
+}
+
+func (l ListOfEdge) Matching(filter EdgeFilter) ListOfEdge {
+	newList := make(ListOfEdge, 0, len(l))
+	for _, edge := range l {
+		if filter(edge) {
+			newList = append(newList, edge)
+		}
+	}
+	return newList
+}
+
+func (l ListOfEdge) Sort(sorter EdgeSorter) {
+	slices.SortFunc(l, sorter)
 }
 
 func NewEdgeFromRef(shape topods.Shape) *Edge {

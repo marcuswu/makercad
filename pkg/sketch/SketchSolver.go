@@ -41,6 +41,8 @@ type SketchSolver interface {
 	CurveDiameter(Entity, float64)
 	MakeFixed(Entity)
 	Transform() gp.Trsf
-	Solve()
+	Solve() error
+	OverConstrained() []string
 	Entities() []Entity
+	LogDebug(string) error
 }

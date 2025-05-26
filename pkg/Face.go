@@ -1,7 +1,9 @@
 package makercad
 
 import (
+	"errors"
 	"math"
+	"slices"
 
 	"github.com/marcuswu/libmakercad/internal/utils"
 	"github.com/marcuswu/libmakercad/pkg/sketch"
@@ -25,6 +27,34 @@ import (
 
 type Face struct {
 	face topods.Face
+}
+
+type ListOfFace []*Face
+
+type FaceFilter func(*Face) bool
+type FaceSorter func(a, b *Face) int
+
+func (l ListOfFace) First(filter FaceFilter) *Face {
+	for _, face := range l {
+		if filter(face) {
+			return face
+		}
+	}
+	return nil
+}
+
+func (l ListOfFace) Matching(filter FaceFilter) ListOfFace {
+	newList := make(ListOfFace, 0, len(l))
+	for _, face := range l {
+		if filter(face) {
+			newList = append(newList, face)
+		}
+	}
+	return newList
+}
+
+func (l ListOfFace) Sort(sorter FaceSorter) {
+	slices.SortFunc(l, sorter)
 }
 
 func NewFace(sketch *Sketch) *Face {
@@ -85,24 +115,27 @@ func (f *Face) Normal() gp.Dir {
 	return props.Normal()
 }
 
-func (f *Face) Revolve(axis *sketch.Line, angle float64) *CadOperation {
+func (f *Face) Revolve(axis *sketch.Line, angle float64) (*CadOperation, error) {
 	list := toptools.NewListOfShape()
 	return f.RevolveMerging(axis, angle, MergeTypeNew, list)
 }
 
-func (f *Face) RevolveMerging(axis *sketch.Line, angle float64, merge MergeType, list toptools.ListOfShape) *CadOperation {
+func (f *Face) RevolveMerging(axis *sketch.Line, angle float64, merge MergeType, list toptools.ListOfShape) (*CadOperation, error) {
 	if !f.IsPlanar() {
-		return nil
+		return nil, errors.New("Cannot revolve non-planar face")
 	}
 
 	start := axis.Start.Convert()
 	end := axis.End.Convert()
+	if start.Distance(end) == 0 {
+		return nil, errors.New("Revolve axis must have non-zero length")
+	}
 	dir := gp.NewDir(end.X()-start.X(), end.Y()-start.Y(), end.Z()-start.Z())
 
 	ax1 := gp.NewAx1(axis.Start.Convert(), dir)
 	shape := brepprimapi.NewMakeRevol(f.face, ax1, angle).Shape()
 	if merge == MergeTypeNew || list.Extent() < 1 {
-		return &CadOperation{Shape{shape}, nil}
+		return &CadOperation{Shape{shape}, nil}, nil
 	}
 
 	operation := mergeTypeToOperation(merge)
@@ -115,7 +148,7 @@ func (f *Face) RevolveMerging(axis *sketch.Line, angle float64, merge MergeType,
 	operation.SetArguments(arguments)
 	operation.Build()
 
-	return &CadOperation{Shape{shape}, operation}
+	return &CadOperation{Shape{shape}, operation}, nil
 }
 
 func (f *Face) Extrude(distance float64) *CadOperation {
@@ -275,7 +308,7 @@ func (f *Face) DistanceAlong(x float64, y float64, z float64) float64 {
 		return 0.0
 	}
 	fromOrigin := gp.NewDirVec(fromOriginVector)
-	direction := gp.NewDirVec(gp.NewVec(x, y, x))
+	direction := gp.NewDirVec(gp.NewVec(x, y, z))
 
 	return direction.Dot(fromOrigin)
 }
@@ -291,14 +324,14 @@ func (f *Face) DistanceFrom(x float64, y float64, z float64) float64 {
 	return location.Distance(gp.NewPnt(x, y, z))
 }
 
-func (f *Face) Edges() []sketch.Edge {
-	edges := make([]sketch.Edge, 0)
+func (f *Face) Edges() sketch.ListOfEdge {
+	edges := make(sketch.ListOfEdge, 0)
 	explorer := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(f.face.Face)), topexp.Edge)
 	for ; explorer.More(); explorer.Next() {
 		if explorer.Depth() > 1 {
 			continue
 		}
-		edges = append(edges, *sketch.NewEdgeFromRef(explorer.Current()))
+		edges = append(edges, sketch.NewEdgeFromRef(explorer.Current()))
 	}
 
 	return edges

@@ -10,14 +10,14 @@ type Shape struct {
 	Shape topods.Shape
 }
 
-func (s *Shape) Faces() []Face {
-	faces := make([]Face, 0)
+func (s Shape) Faces() ListOfFace {
+	faces := make([]*Face, 0)
 	for ex := topexp.NewExplorer(s.Shape, topexp.Face); ex.More(); ex.Next() {
 		if ex.Depth() > 1 {
 			continue
 		}
 
-		faces = append(faces, Face{topods.NewFaceFromRef(topods.TopoDSFace(ex.Current().Shape))})
+		faces = append(faces, &Face{topods.NewFaceFromRef(topods.TopoDSFace(ex.Current().Shape))})
 	}
 
 	return faces

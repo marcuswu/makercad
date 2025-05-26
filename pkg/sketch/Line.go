@@ -2,6 +2,7 @@ package sketch
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/marcuswu/gooccwrapper/brepbuilderapi"
 	"github.com/marcuswu/gooccwrapper/geom"
@@ -63,7 +64,15 @@ func (l *Line) Angle(other *Line, angle float64) *Line {
 }
 
 func (l *Line) MakeEdge() *Edge {
-	segment := geom.MakeSegment(l.Start.Convert(), l.End.Convert())
+	if l.Start.ID() == l.End.ID() {
+		return nil
+	}
+	start, end := l.Start.Convert(), l.End.Convert()
+	if start.Distance(end) == 0 {
+		return nil
+	}
+	log.Printf("Making edge from line %s\n", l.String())
+	segment := geom.MakeSegment(start, end)
 	return &Edge{brepbuilderapi.NewMakeEdge(segment).ToTopoDSEdge()}
 }
 
