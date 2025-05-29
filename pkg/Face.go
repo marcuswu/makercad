@@ -95,7 +95,7 @@ func (f *Face) Plane() gp.Ax3 {
 	if surface.Type() != geomabs.Plane {
 		return sketch.NewPlaneParameters().Plane()
 	}
-	normal := surface.Plane().Axis().Direction()
+	normal := f.Normal()
 	location := f.getCenter()
 	xDir := surface.Plane().Position().XDirection()
 

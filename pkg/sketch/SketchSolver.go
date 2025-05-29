@@ -10,6 +10,8 @@ type SketchSolver interface {
 	//createSketch(PlaneParameters) Sketch2D
 	CoordinateSystem() gp.Ax3
 	Origin() *Point
+	XAxis() *Line
+	YAxis() *Line
 	// LookupEntity(uint) Entity
 	CreatePoint(x float64, y float64) *Point
 	CreateLine(startX float64, startY float64, endX float64, endY float64) *Line

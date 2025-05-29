@@ -100,6 +100,6 @@ func (p *PlaneParameters) Translated(dir Vector) *PlaneParameters {
 	return NewPlaneParametersFromCoordinateSystem(p.Plane().Translated(dir.ToVector()))
 }
 
-func (p *PlaneParameters) ToString() string {
-	return fmt.Sprintf("{ location: %s, x: %s, y: %s }\n", p.Location.ToString(), p.Normal.ToString(), p.X.ToString())
+func (p *PlaneParameters) String() string {
+	return fmt.Sprintf("{ location: %s, normal: %s, x dir: %s }\n", p.Location.ToString(), p.Normal.ToString(), p.X.ToString())
 }

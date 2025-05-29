@@ -1,6 +1,7 @@
 package sketch
 
 import (
+	"log"
 	"slices"
 
 	"github.com/marcuswu/gooccwrapper/brepadapter"
@@ -62,12 +63,14 @@ func (e *Edge) IsEllipse() bool {
 
 func (e *Edge) projectPointToSketch(solver SketchSolver, point gp.Pnt) (float64, float64) {
 	origin := solver.CoordinateSystem().Location()
-	originDir := gp.NewDir(origin.X(), origin.Y(), origin.Z())
-	pointDir := gp.NewDirVec(gp.NewVec(point.X(), point.Y(), point.Z()))
-	u := solver.CoordinateSystem().XDirection()
-	v := solver.CoordinateSystem().YDirection()
-	x := u.Dot(pointDir) - u.Dot(originDir)
-	y := v.Dot(pointDir) - u.Dot(originDir)
+	originVec := gp.NewVec(origin.X(), origin.Y(), origin.Z())
+	pointVec := gp.NewVec(point.X(), point.Y(), point.Z())
+	xDir := solver.CoordinateSystem().XDirection()
+	u := gp.NewVec(xDir.X(), xDir.Y(), xDir.Z())
+	yDir := solver.CoordinateSystem().YDirection()
+	v := gp.NewVec(yDir.X(), yDir.Y(), yDir.Z())
+	x := u.Dot(pointVec) - u.Dot(originVec)
+	y := v.Dot(pointVec) - v.Dot(originVec)
 	return x, y
 }
 
@@ -82,6 +85,10 @@ func (e *Edge) GetLine(solver SketchSolver) *Line {
 	endX, endY := e.projectPointToSketch(solver, breptool.Pnt(topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape))))
 
 	line := solver.CreateLine(startX, startY, endX, endY)
+	line.Start.VerticalDistance(solver.XAxis(), startY)
+	line.Start.HorizontalDistance(solver.YAxis(), startX)
+	line.End.VerticalDistance(solver.XAxis(), endY)
+	line.End.HorizontalDistance(solver.YAxis(), endX)
 	solver.MakeFixed(line)
 	return line
 }
@@ -110,6 +117,11 @@ func (e *Edge) GetCircle(solver SketchSolver) *Circle {
 	radius := circle.Radius()
 
 	circ := solver.CreateCircle(centerX, centerY, radius)
+	log.Println("Adding projected circle vertical distance constraint")
+	circ.Center.VerticalDistance(solver.XAxis(), centerY)
+	log.Println("Adding projected circle horizontal distance constraint")
+	circ.Center.HorizontalDistance(solver.YAxis(), centerX)
+	circ.Diameter(radius * 2)
 	solver.MakeFixed(circ)
 	return circ
 }

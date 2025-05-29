@@ -3,6 +3,7 @@ package sketch
 import (
 	"github.com/marcuswu/dlineate"
 	"github.com/marcuswu/gooccwrapper/gp"
+	"github.com/rs/zerolog/log"
 )
 
 type DlineateSolver struct {
@@ -10,15 +11,15 @@ type DlineateSolver struct {
 	entities         []Entity
 	coordinateSystem gp.Ax3
 	origin           *Point
-	XAxis            *Line
-	YAxis            *Line
+	xAxis            *Line
+	yAxis            *Line
 }
 
 func NewDlineateSolver(planer Planer) *DlineateSolver {
 	solver := &DlineateSolver{dlineate.NewSketch(), make([]Entity, 0), planer.Plane(), nil, nil, nil}
 	solver.origin = &Point{Element: *solver.system.Origin, solver: solver, X: 0, Y: 0, isConstruction: true}
-	solver.XAxis = &Line{Element: *solver.system.XAxis, solver: solver, Start: nil, End: nil, isConstruction: true}
-	solver.YAxis = &Line{Element: *solver.system.YAxis, solver: solver, Start: nil, End: nil, isConstruction: true}
+	solver.xAxis = &Line{Element: *solver.system.XAxis, solver: solver, Start: nil, End: nil, isConstruction: true}
+	solver.yAxis = &Line{Element: *solver.system.YAxis, solver: solver, Start: nil, End: nil, isConstruction: true}
 	return solver
 }
 
@@ -28,6 +29,14 @@ func (s *DlineateSolver) Entities() []Entity {
 
 func (s *DlineateSolver) Origin() *Point {
 	return s.origin
+}
+
+func (s *DlineateSolver) XAxis() *Line {
+	return s.xAxis
+}
+
+func (s *DlineateSolver) YAxis() *Line {
+	return s.yAxis
 }
 
 func (s *DlineateSolver) CreatePoint(x float64, y float64) *Point {
@@ -97,33 +106,68 @@ func (s *DlineateSolver) Coincident(e1 Entity, e2 Entity) {
 }
 
 func (s *DlineateSolver) PointVerticalDistance(p *Point, e Entity, d float64) {
-	pe, ok := e.(*Point)
-	if !ok {
-		pe = s.CreatePoint(0, 0)
-		s.system.AddCoincidentConstraint(pe.getElement(), e.getElement())
-		pe.isConstruction = true
+	el, ok := e.(*Line)
+	// Special case if constraining against origin, use x axis
+	if s.origin.getElement().ID() == e.getElement().ID() {
+		el = s.xAxis
+		ok = true
 	}
-	cl := s.CreateLine(p.X, p.Y, pe.X, pe.Y)
-	cl.isConstruction = true
-	s.system.AddCoincidentConstraint(p.getElement(), cl.getElement())
-	s.system.AddCoincidentConstraint(pe.getElement(), cl.getElement())
-	s.system.AddVerticalConstraint(cl.getElement())
-	s.system.AddDistanceConstraint(p.getElement(), e.getElement(), d)
+	var cl *Line
+	if ok {
+		newY, _, ok := e.getElement().PointVerticalFrom(p.X, p.Y)
+		if !ok {
+			return
+		}
+		cl = s.CreateLine(p.X, p.Y, p.X, newY)
+		cl.Vertical().Start.Coincident(p)
+		cl.End.Coincident(el)
+		cl.SetConstruction(true)
+	}
+	ep, ok := e.(*Point)
+	if ok {
+		vl := s.CreateLine(ep.X, ep.Y, p.X, ep.Y)
+		vl.Horizontal().Start.Coincident(ep)
+		vl.SetConstruction(true)
+		cl = s.CreateLine(p.X, p.Y, p.X, ep.Y)
+		cl.Vertical().End.Coincident(vl.End)
+		cl.Start.Coincident(p)
+		cl.SetConstruction(true)
+	}
+	cl.Length(d)
 }
 
 func (s *DlineateSolver) PointHorizontalDistance(p *Point, e Entity, d float64) {
-	pe, ok := e.(*Point)
-	if !ok {
-		pe = s.CreatePoint(0, 0)
-		s.system.AddCoincidentConstraint(pe.getElement(), e.getElement())
-		pe.isConstruction = true
+	// e is some line
+	// Create a horizontally constrained line from p to e; set distance
+	el, ok := e.(*Line)
+	var cl *Line
+	// Special case if constraining against origin, use y axis
+	if s.origin.getElement().ID() == e.getElement().ID() {
+		el = s.yAxis
+		ok = true
 	}
-	cl := s.CreateLine(p.X, p.Y, pe.X, pe.Y)
-	cl.isConstruction = true
-	s.system.AddCoincidentConstraint(p.getElement(), cl.getElement())
-	s.system.AddCoincidentConstraint(pe.getElement(), cl.getElement())
-	s.system.AddHorizontalConstraint(cl.getElement())
-	s.system.AddDistanceConstraint(p.getElement(), e.getElement(), d)
+	if ok {
+		newX, _, ok := e.getElement().PointHorizontalFrom(p.X, p.Y)
+		if !ok {
+			return
+		}
+		cl = s.CreateLine(p.X, p.Y, newX, p.Y)
+		cl.Horizontal().Start.Coincident(p)
+		cl.End.Coincident(el)
+		cl.SetConstruction(true)
+	}
+	// e is some point
+	ep, ok := e.(*Point)
+	if ok {
+		vl := s.CreateLine(ep.X, ep.Y, ep.X, p.Y)
+		vl.Vertical().Start.Coincident(ep)
+		vl.SetConstruction(true)
+		cl = s.CreateLine(p.X, p.Y, ep.X, p.Y)
+		cl.Horizontal().End.Coincident(vl.End)
+		cl.Start.Coincident(p)
+		cl.SetConstruction(true)
+	}
+	cl.Length(d)
 }
 
 func (s *DlineateSolver) PointProjectedDistance(p *Point, e Entity, d float64) {
@@ -191,14 +235,26 @@ func (s *DlineateSolver) Equal(e1 Entity, e2 Entity) {
 
 func (s *DlineateSolver) CurveDiameter(e Entity, d float64) {
 	if a, ok := e.(*Arc); ok {
+		log.Debug().
+			Uint("center", a.Center.getElement().ID()).
+			Uint("start", a.Start.getElement().ID()).
+			Uint("end", a.End.getElement().ID()).
+			Float64("radius", d/2).
+			Msg("Setting arc diameter")
 		s.system.AddDistanceConstraint(a.Center.getElement(), a.Start.getElement(), d/2)
+		s.system.AddDistanceConstraint(a.Center.getElement(), a.End.getElement(), d/2)
 		return
 	}
 	c, ok := e.(*Circle)
 	if !ok {
 		return
 	}
-	// This requires that the circle
+	log.Debug().
+		Uint("center", c.Center.getElement().ID()).
+		Float64("diameter", d).
+		Msg("Setting circle diameter")
+	// This is a special constraint -- it's possible nothing relies on the circle's diameter
+	// It's also possible something is coincident with it. We'll have to resolve that at solve time
 	s.system.AddDistanceConstraint(c.getElement(), nil, d/2)
 }
 
