@@ -106,12 +106,12 @@ func (s *DlineateSolver) Coincident(e1 Entity, e2 Entity) {
 }
 
 func (s *DlineateSolver) PointVerticalDistance(p *Point, e Entity, d float64) {
-	el, ok := e.(*Line)
 	// Special case if constraining against origin, use x axis
-	if s.origin.getElement().ID() == e.getElement().ID() {
-		el = s.xAxis
-		ok = true
+	if s.origin.getElement().ID() == e.getElement().ID() || s.xAxis.getElement().ID() == e.getElement().ID() {
+		p.Distance(s.xAxis, d)
+		return
 	}
+	el, ok := e.(*Line)
 	var cl *Line
 	if ok {
 		newY, _, ok := e.getElement().PointVerticalFrom(p.X, p.Y)
@@ -139,13 +139,13 @@ func (s *DlineateSolver) PointVerticalDistance(p *Point, e Entity, d float64) {
 func (s *DlineateSolver) PointHorizontalDistance(p *Point, e Entity, d float64) {
 	// e is some line
 	// Create a horizontally constrained line from p to e; set distance
+	// Special case if constraining against origin, use y axis
+	if s.origin.getElement().ID() == e.getElement().ID() || s.yAxis.getElement().ID() == e.getElement().ID() {
+		p.Distance(s.yAxis, d)
+		return
+	}
 	el, ok := e.(*Line)
 	var cl *Line
-	// Special case if constraining against origin, use y axis
-	if s.origin.getElement().ID() == e.getElement().ID() {
-		el = s.yAxis
-		ok = true
-	}
 	if ok {
 		newX, _, ok := e.getElement().PointHorizontalFrom(p.X, p.Y)
 		if !ok {

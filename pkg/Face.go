@@ -7,6 +7,7 @@ import (
 
 	"github.com/marcuswu/libmakercad/internal/utils"
 	"github.com/marcuswu/libmakercad/pkg/sketch"
+	"github.com/rs/zerolog/log"
 
 	"github.com/marcuswu/gooccwrapper/brepadapter"
 	"github.com/marcuswu/gooccwrapper/brepalgoapi"
@@ -58,6 +59,7 @@ func (l ListOfFace) Sort(sorter FaceSorter) {
 }
 
 func NewFace(sketch *Sketch) *Face {
+	brepbuilderapi.SetPrecision(0.0001)
 	wires := make([]topods.Wire, 0)
 	entities := sketch.solver.Entities()
 	for i := range entities {
@@ -71,12 +73,16 @@ func NewFace(sketch *Sketch) *Face {
 		}
 	}
 
+	log.Debug().Int("wire count", len(wires)).Msg("Making combined wire for face")
 	combined := brepbuilderapi.NewMakeWire()
 	for i := range wires {
 		combined.AddWire(wires[i])
 	}
+	wire := combined.ToTopoDSWire()
+	makeFace := brepbuilderapi.NewMakeFace(wire)
+	topoFace := makeFace.ToTopoDSFace()
 
-	return &Face{brepbuilderapi.NewMakeFace(combined.ToTopoDSWire()).ToTopoDSFace()}
+	return &Face{topoFace}
 }
 
 func (f *Face) getCenter() gp.Pnt {

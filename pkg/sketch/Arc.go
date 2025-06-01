@@ -41,12 +41,13 @@ func (a *Arc) Tangent(l *Line) *Arc {
 }
 
 func (a *Arc) MakeEdge() *Edge {
-	// centerPnt := a.Center.Convert()
-	centerPoint := gp.NewPnt(a.Center.X, a.Center.Y, 0.0)
-	center := gp.NewAx2(centerPoint, a.solver.CoordinateSystem().Direction())
-	start := gp.NewPnt(a.Start.X, a.Start.Y, 0.0)
-	end := gp.NewPnt(a.End.X, a.End.Y, 0.0)
-	radius := gp.NewVecPoints(start, end).Magnitude()
+	centerPoint := a.Center.Convert()
+	normalDir := a.solver.CoordinateSystem().Direction()
+	xDir := a.solver.CoordinateSystem().XDirection()
+	center := gp.NewAx2(centerPoint, normalDir, xDir)
+	start := a.Start.Convert()
+	end := a.End.Convert()
+	radius := gp.NewVecPoints(centerPoint, start).Magnitude()
 	circle := gp.NewCirc(center, radius)
 	arc := geom.MakeArc(circle, start, end, true)
 	return &Edge{brepbuilderapi.NewMakeEdge(arc).ToTopoDSEdge()}

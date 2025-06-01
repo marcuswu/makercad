@@ -1,6 +1,8 @@
 package sketch
 
 import (
+	"log"
+
 	"github.com/marcuswu/dlineate"
 	"github.com/marcuswu/gooccwrapper/brepbuilderapi"
 	"github.com/marcuswu/gooccwrapper/geom"
@@ -46,9 +48,10 @@ func (c *Circle) UpdateFromValues() {
 }
 
 func (c *Circle) MakeEdge() *Edge {
+	log.Printf("Making edge from circle %s\n", c.String())
 	centerPoint := gp.NewPnt(c.Center.X, c.Center.Y, 0.0)
 	radius := c.Radius
-	center := gp.NewAx2(centerPoint, c.solver.CoordinateSystem().Direction())
+	center := gp.NewAx2(centerPoint, c.solver.CoordinateSystem().Direction(), c.solver.CoordinateSystem().XDirection())
 	circle := geom.MakeCircle(center, radius)
 	return &Edge{brepbuilderapi.NewMakeEdge(circle).ToTopoDSEdge()}
 }
