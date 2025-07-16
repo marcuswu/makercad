@@ -12,16 +12,19 @@ const (
 )
 
 type CadOperation struct {
-	shape     Shape
+	shapes    ListOfShape
 	operation *brepalgoapi.Boolean
 }
 
-func NewCadOperation(e Shape, op *brepalgoapi.Boolean) *CadOperation {
-	return &CadOperation{shape: e, operation: op}
+func NewCadOperation(e ListOfShape, op *brepalgoapi.Boolean) *CadOperation {
+	return &CadOperation{shapes: e, operation: op}
 }
 
 func (o *CadOperation) Shape() Shape {
-	shape := o.shape
+	shape := Shape{}
+	if len(o.shapes) > 0 {
+		shape = o.shapes[0]
+	}
 	if o.operation != nil {
 		shape = Shape{o.operation.Shape()}
 	}

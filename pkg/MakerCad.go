@@ -6,10 +6,15 @@ import (
 	"github.com/marcuswu/libmakercad/pkg/sketch"
 
 	"github.com/marcuswu/gooccwrapper/brep"
+	"github.com/marcuswu/gooccwrapper/brepalgoapi"
+	"github.com/marcuswu/gooccwrapper/brepfilletapi"
 	"github.com/marcuswu/gooccwrapper/brepmesh"
+	"github.com/marcuswu/gooccwrapper/brepprimapi"
+	"github.com/marcuswu/gooccwrapper/gp"
 	"github.com/marcuswu/gooccwrapper/stepcontrol"
 	"github.com/marcuswu/gooccwrapper/stlapi"
 	"github.com/marcuswu/gooccwrapper/topods"
+	"github.com/marcuswu/gooccwrapper/toptools"
 )
 
 type ExportQuality int
@@ -121,4 +126,52 @@ func (*MakerCad) ExportStep(filename string, shapes ListOfShape) error {
 	}
 
 	return nil
+}
+
+func (*MakerCad) MakeBox(plane sketch.Planer, dx, dy, dz float64, centerXY bool) Shape {
+	p := plane.Plane()
+	origin := p.Location()
+	if centerXY {
+		origin.Translate(gp.NewVec(-dx/2.0, -dy/2.0, 0))
+	}
+	position := gp.NewAx2(origin, p.Direction(), p.XDirection())
+	return Shape{brepprimapi.NewMakeBox(position, dx, dy, dz).Shape()}
+}
+
+func (*MakerCad) MakeCylinder(plane sketch.Planer, radius, height float64) Shape {
+	p := plane.Plane()
+	position := gp.NewAx2(p.Location(), p.Direction(), p.XDirection())
+	return Shape{brepprimapi.NewMakeCylinder(position, radius, height).Shape()}
+}
+
+func (*MakerCad) Combine(target Shape, tools ListOfShape) (*CadOperation, error) {
+	operation := brepalgoapi.NewFuse().ToBooleanOperation()
+	arguments := toptools.NewListOfShape()
+	arguments.Append(target.Shape)
+
+	operation.SetTools(tools.ToCascadeList())
+	operation.SetArguments(arguments)
+	operation.Build()
+
+	return NewCadOperation(tools, &operation), nil
+}
+
+func (*MakerCad) Remove(target Shape, tools ListOfShape) (*CadOperation, error) {
+	operation := brepalgoapi.NewCut().ToBooleanOperation()
+	arguments := toptools.NewListOfShape()
+	arguments.Append(target.Shape)
+
+	operation.SetTools(tools.ToCascadeList())
+	operation.SetArguments(arguments)
+	operation.Build()
+
+	return NewCadOperation(tools, &operation), nil
+}
+
+func (*MakerCad) Fillet(target Shape, edges sketch.ListOfEdge, radius float64) (Shape, error) {
+	fillet := brepfilletapi.NewMakeFillet(topods.TopoDSShape(target.Shape.Shape))
+	for _, e := range edges {
+		fillet.AddEdge(topods.TopoDSEdge(e.Edge.Edge), radius)
+	}
+	return Shape{fillet.Shape()}, nil
 }

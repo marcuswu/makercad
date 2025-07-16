@@ -6,6 +6,9 @@
 - [x] Plan sketch types to be compatible with makercad elements
 - [x] Build out sketch elements
 - [x] Complete SketchSolver interface in DlineateSolver
+- [ ] Reduce verbosity
+  - [ ] Add helpers for sorting & filtering
+  - [ ] Add helpers for boolean operations
 - [ ] Build External API
   - [ ] Walk through Node API for original MakerCad
   - [ ] Implement interfaces in CadTypes.go

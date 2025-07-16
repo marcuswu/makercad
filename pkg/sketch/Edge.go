@@ -4,8 +4,9 @@ import (
 	"log"
 	"slices"
 
+	"github.com/marcuswu/dlineate/utils"
 	"github.com/marcuswu/gooccwrapper/brepadapter"
-	"github.com/marcuswu/gooccwrapper/breptool"
+	"github.com/marcuswu/gooccwrapper/gcpnts"
 	"github.com/marcuswu/gooccwrapper/gp"
 	"github.com/marcuswu/gooccwrapper/topexp"
 	"github.com/marcuswu/gooccwrapper/topods"
@@ -38,8 +39,70 @@ func (l ListOfEdge) Matching(filter EdgeFilter) ListOfEdge {
 	return newList
 }
 
+func (l ListOfEdge) IsLine() ListOfEdge {
+	return l.Matching(func(e *Edge) bool {
+		return e.IsLine()
+	})
+}
+
+func (l ListOfEdge) Length(length float64) ListOfEdge {
+	return l.Matching(func(e *Edge) bool {
+		return utils.FloatCompare(e.LineLength(), length, utils.StandardCompare) == 0
+	})
+}
+
+func (l ListOfEdge) Parallel(dir gp.Dir) ListOfEdge {
+	return l.Matching(func(e *Edge) bool {
+		return e.IsParallel(dir)
+	})
+}
+
 func (l ListOfEdge) Sort(sorter EdgeSorter) {
 	slices.SortFunc(l, sorter)
+}
+
+func (l ListOfEdge) SortByLength(inverse bool) {
+	l.Sort(func(a, b *Edge) int {
+		aL := a.LineLength()
+		bL := b.LineLength()
+		if inverse {
+			return utils.StandardFloatCompare(bL, aL)
+		}
+		return utils.StandardFloatCompare(aL, bL)
+	})
+}
+
+func (l ListOfEdge) SortByX(inverse bool) {
+	l.Sort(func(a, b *Edge) int {
+		aX := a.FirstVertex().X()
+		bX := b.FirstVertex().X()
+		if inverse {
+			return utils.StandardFloatCompare(bX, aX)
+		}
+		return utils.StandardFloatCompare(aX, bX)
+	})
+}
+
+func (l ListOfEdge) SortByY(inverse bool) {
+	l.Sort(func(a, b *Edge) int {
+		aY := a.FirstVertex().Y()
+		bY := b.FirstVertex().Y()
+		if inverse {
+			return utils.StandardFloatCompare(bY, aY)
+		}
+		return utils.StandardFloatCompare(aY, bY)
+	})
+}
+
+func (l ListOfEdge) SortByZ(inverse bool) {
+	l.Sort(func(a, b *Edge) int {
+		aZ := a.FirstVertex().Z()
+		bZ := b.FirstVertex().Z()
+		if inverse {
+			return utils.StandardFloatCompare(bZ, aZ)
+		}
+		return utils.StandardFloatCompare(aZ, bZ)
+	})
 }
 
 func NewEdgeFromRef(shape topods.Shape) *Edge {
@@ -61,6 +124,24 @@ func (e *Edge) IsEllipse() bool {
 	return curve.IsEllipse()
 }
 
+func (e *Edge) FirstVertex() gp.Pnt {
+	verts := e.Vertexes()
+	if len(verts) < 1 {
+		return gp.NewPnt(0, 0, 0)
+	}
+
+	return verts[0].ToPoint()
+}
+
+func (e *Edge) LastVertex() gp.Pnt {
+	verts := e.Vertexes()
+	if len(verts) < 1 {
+		return gp.NewPnt(0, 0, 0)
+	}
+
+	return verts[len(verts)-1].ToPoint()
+}
+
 func (e *Edge) projectPointToSketch(solver SketchSolver, point gp.Pnt) (float64, float64) {
 	origin := solver.CoordinateSystem().Location()
 	originVec := gp.NewVec(origin.X(), origin.Y(), origin.Z())
@@ -80,9 +161,9 @@ func (e *Edge) GetLine(solver SketchSolver) *Line {
 	}
 
 	ex := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(&e.Edge)), topexp.Vertex)
-	startX, startY := e.projectPointToSketch(solver, breptool.Pnt(topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape))))
+	startX, startY := e.projectPointToSketch(solver, topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape)).Pnt())
 	ex.Next()
-	endX, endY := e.projectPointToSketch(solver, breptool.Pnt(topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape))))
+	endX, endY := e.projectPointToSketch(solver, topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape)).Pnt())
 
 	line := solver.CreateLine(startX, startY, endX, endY)
 	line.Start.VerticalDistance(solver.XAxis(), startY)
@@ -94,16 +175,7 @@ func (e *Edge) GetLine(solver SketchSolver) *Line {
 }
 
 func (e *Edge) LineLength() float64 {
-	if !e.IsLine() {
-		return 0.0
-	}
-
-	ex := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(&e.Edge)), topexp.Vertex)
-	start := breptool.Pnt(topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape)))
-	ex.Next()
-	end := breptool.Pnt(topods.NewVertexFromRef(topods.TopoDSVertex(ex.Current().Shape)))
-
-	return start.Distance(end)
+	return gcpnts.CurveLength(brepadapter.NewCurve(e.Edge))
 }
 
 func (e *Edge) GetCircle(solver SketchSolver) *Circle {
@@ -135,4 +207,47 @@ func (e *Edge) CircleRadius() float64 {
 	circle := curve.ToCircle()
 
 	return circle.Radius()
+}
+
+func (e *Edge) IsParallel(v gp.Dir) bool {
+	if !e.IsLine() {
+		return false
+	}
+
+	verts := e.Vertexes()
+	if len(verts) < 2 {
+		return false
+	}
+	first := verts[0].ToPoint()
+	last := verts[len(verts)-1].ToPoint()
+	dir := gp.NewDir(last.X()-first.X(), last.Y()-first.Y(), last.Z()-first.Z())
+
+	return dir.IsParallel(v)
+}
+
+func (e *Edge) Midpoint() gp.Pnt {
+	if !e.IsLine() {
+		return gp.NewPnt(0, 0, 0)
+	}
+
+	verts := e.Vertexes()
+	if len(verts) < 2 {
+		return gp.NewPnt(0, 0, 0)
+	}
+	first := verts[0].ToPoint()
+	last := verts[len(verts)-1].ToPoint()
+	return gp.NewPnt((last.X()+first.X())/2., (last.Y()+first.Y())/2., (last.Z()+first.Z())/2.)
+}
+
+func (e *Edge) Vertexes() ListOfVertex {
+	edges := make(ListOfVertex, 0)
+	explorer := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(e.Edge.Edge)), topexp.Vertex)
+	for ; explorer.More(); explorer.Next() {
+		if explorer.Depth() > 1 {
+			continue
+		}
+		edges = append(edges, NewVertexFromRef(explorer.Current()))
+	}
+
+	return edges
 }

@@ -5,6 +5,7 @@ import (
 	"math"
 	"slices"
 
+	floatUtils "github.com/marcuswu/dlineate/utils"
 	"github.com/marcuswu/libmakercad/internal/utils"
 	"github.com/marcuswu/libmakercad/pkg/sketch"
 	"github.com/rs/zerolog/log"
@@ -14,7 +15,6 @@ import (
 	"github.com/marcuswu/gooccwrapper/brepbuilderapi"
 	"github.com/marcuswu/gooccwrapper/brepgprop"
 	"github.com/marcuswu/gooccwrapper/brepprimapi"
-	"github.com/marcuswu/gooccwrapper/breptool"
 	"github.com/marcuswu/gooccwrapper/breptools"
 	"github.com/marcuswu/gooccwrapper/geomabs"
 	"github.com/marcuswu/gooccwrapper/geomadapter"
@@ -24,6 +24,15 @@ import (
 	"github.com/marcuswu/gooccwrapper/topexp"
 	"github.com/marcuswu/gooccwrapper/topods"
 	"github.com/marcuswu/gooccwrapper/toptools"
+)
+
+type Orientation int
+
+const (
+	Forward = iota
+	Reversed
+	Internal
+	External
 )
 
 type Face struct {
@@ -56,6 +65,55 @@ func (l ListOfFace) Matching(filter FaceFilter) ListOfFace {
 
 func (l ListOfFace) Sort(sorter FaceSorter) {
 	slices.SortFunc(l, sorter)
+}
+
+func (l ListOfFace) Planar() ListOfFace {
+	return l.Matching(func(f *Face) bool { return f.IsPlanar() })
+}
+
+func (l ListOfFace) AlignedWith(plane *sketch.PlaneParameters) ListOfFace {
+	return l.Matching(func(f *Face) bool { return f.IsAlignedWithPlane(plane) })
+}
+
+func (l ListOfFace) SortByX(inverse bool) {
+	l.Sort(func(a, b *Face) int {
+		aX := a.getCenter().X()
+		bX := b.getCenter().X()
+		if inverse {
+			return floatUtils.StandardFloatCompare(bX, aX)
+		}
+		return floatUtils.StandardFloatCompare(aX, bX)
+	})
+}
+
+func (l ListOfFace) SortByY(inverse bool) {
+	l.Sort(func(a, b *Face) int {
+		aY := a.getCenter().Y()
+		bY := b.getCenter().Y()
+		if inverse {
+			return floatUtils.StandardFloatCompare(bY, aY)
+		}
+		return floatUtils.StandardFloatCompare(aY, bY)
+	})
+}
+
+func (l ListOfFace) SortByZ(inverse bool) {
+	l.Sort(func(a, b *Face) int {
+		aZ := a.getCenter().Z()
+		bZ := b.getCenter().Z()
+		if inverse {
+			return floatUtils.StandardFloatCompare(bZ, aZ)
+		}
+		return floatUtils.StandardFloatCompare(aZ, bZ)
+	})
+}
+
+func (l ListOfFace) Edges() sketch.ListOfEdge {
+	le := sketch.ListOfEdge{}
+	for _, e := range l {
+		le = append(le, e.Edges()...)
+	}
+	return le
 }
 
 func NewFace(sketch *Sketch) *Face {
@@ -116,9 +174,13 @@ func (f *Face) Plane() gp.Ax3 {
 
 func (f *Face) Normal() gp.Dir {
 	umin, _, vmin, _ := breptools.UVBounds(f.face)
-	surface := breptool.Surface(f.face)
+	surface := f.face.Surface()
 	props := geomlprop.NewSLProps(surface, umin, vmin, 1, 0.01)
-	return props.Normal()
+	normal := props.Normal()
+	if f.face.Orientation() == Reversed {
+		normal = gp.NewDir(-normal.X(), -normal.Y(), -normal.Z())
+	}
+	return normal
 }
 
 func (f *Face) Revolve(axis *sketch.Line, angle float64) (*CadOperation, error) {
@@ -128,20 +190,20 @@ func (f *Face) Revolve(axis *sketch.Line, angle float64) (*CadOperation, error) 
 
 func (f *Face) RevolveMerging(axis *sketch.Line, angle float64, merge MergeType, list toptools.ListOfShape) (*CadOperation, error) {
 	if !f.IsPlanar() {
-		return nil, errors.New("Cannot revolve non-planar face")
+		return nil, errors.New("cannot revolve non-planar face")
 	}
 
 	start := axis.Start.Convert()
 	end := axis.End.Convert()
 	if start.Distance(end) == 0 {
-		return nil, errors.New("Revolve axis must have non-zero length")
+		return nil, errors.New("revolve axis must have non-zero length")
 	}
 	dir := gp.NewDir(end.X()-start.X(), end.Y()-start.Y(), end.Z()-start.Z())
 
 	ax1 := gp.NewAx1(axis.Start.Convert(), dir)
 	shape := brepprimapi.NewMakeRevol(f.face, ax1, angle).Shape()
 	if merge == MergeTypeNew || list.Extent() < 1 {
-		return &CadOperation{Shape{shape}, nil}, nil
+		return &CadOperation{[]Shape{{shape}}, nil}, nil
 	}
 
 	operation := mergeTypeToOperation(merge)
@@ -154,7 +216,7 @@ func (f *Face) RevolveMerging(axis *sketch.Line, angle float64, merge MergeType,
 	operation.SetArguments(arguments)
 	operation.Build()
 
-	return &CadOperation{Shape{shape}, operation}, nil
+	return &CadOperation{[]Shape{{shape}}, operation}, nil
 }
 
 func (f *Face) Extrude(distance float64) *CadOperation {
@@ -171,7 +233,7 @@ func (f *Face) ExtrudeMerging(distance float64, merge MergeType, list toptools.L
 
 	shape := brepprimapi.NewMakePrism(f.face, gp.NewVecDir(coordSystem).Multiplied(distance)).Shape()
 	if merge == MergeTypeNew || list.Extent() < 1 {
-		return &CadOperation{Shape{shape}, nil}
+		return &CadOperation{[]Shape{{shape}}, nil}
 	}
 
 	operation := mergeTypeToOperation(merge)
@@ -184,7 +246,7 @@ func (f *Face) ExtrudeMerging(distance float64, merge MergeType, list toptools.L
 	operation.SetArguments(arguments)
 	operation.Build()
 
-	return &CadOperation{Shape{shape}, operation}
+	return &CadOperation{[]Shape{{shape}}, operation}
 }
 
 func mergeTypeToOperation(merge MergeType) *brepalgoapi.Boolean {
@@ -223,9 +285,10 @@ func (f *Face) IsAlignedWithFace(other *Face) bool {
 	if otherSurface.Type() != geomabs.Plane {
 		return false
 	}
-	normal := surface.Plane().Axis().Direction()
-	otherNormal := otherSurface.Plane().Axis().Direction()
-	return normal.IsParallel(otherNormal)
+	normal := f.Normal()
+	otherNormal := other.Normal()
+
+	return normal.IsEqual(otherNormal)
 }
 
 func (f *Face) IsAlignedWithPlane(plane *sketch.PlaneParameters) bool {
@@ -233,25 +296,25 @@ func (f *Face) IsAlignedWithPlane(plane *sketch.PlaneParameters) bool {
 	if surface.Type() != geomabs.Plane {
 		return false
 	}
-	normal := surface.Plane().Axis().Direction()
+	normal := f.Normal()
 	planeNormal := gp.NewDirVec(gp.NewVec(plane.Normal.X, plane.Normal.Y, plane.Normal.Z))
-	return planeNormal.IsParallel(normal)
+	return planeNormal.IsEqual(normal)
 }
 
 func (f *Face) IsConical() bool {
-	surf := geomadapter.NewSurface(breptool.Surface(f.face))
+	surf := geomadapter.NewSurface(f.face.Surface())
 	defer surf.Free()
 	return surf.IsConical()
 }
 
 func (f *Face) IsCylindrical() bool {
-	surf := geomadapter.NewSurface(breptool.Surface(f.face))
+	surf := geomadapter.NewSurface(f.face.Surface())
 	defer surf.Free()
 	return surf.IsCylindrical()
 }
 
 func (f *Face) IsPlanar() bool {
-	surf := geomadapter.NewSurface(breptool.Surface(f.face))
+	surf := geomadapter.NewSurface(f.face.Surface())
 	defer surf.Free()
 	return surf.IsPlanar()
 }

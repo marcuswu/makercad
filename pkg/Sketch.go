@@ -16,6 +16,14 @@ func (s *Sketch) Origin() *sketch.Point {
 	return s.solver.Origin()
 }
 
+func (s *Sketch) XAxis() *sketch.Line {
+	return s.solver.XAxis()
+}
+
+func (s *Sketch) YAxis() *sketch.Line {
+	return s.solver.YAxis()
+}
+
 func (s *Sketch) Arc(centerX float64, centerY float64, startX float64, startY float64, endX float64, endY float64) *sketch.Arc {
 	return s.solver.CreateArc(centerX, centerY, startX, startY, endX, endY)
 }

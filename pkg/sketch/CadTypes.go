@@ -79,17 +79,20 @@ func (p *PlaneParameters) Rotated(a ...interface{}) *PlaneParameters {
 	if argc < 1 || argc > 3 {
 		panic("No match for overloaded function call")
 	}
-	degrees := 0.0
-	axis := NewVectorFromValues(0, 0, 0)
-	origin := NewVectorFromValues(0, 0, 0)
+	degrees := a[0].(float64)
+	var axis, origin *Vector
 
 	if argc < 2 {
 		// calculate axis
 		axis = NewVector(p.Normal.ToVector())
+	} else {
+		axis = a[1].(*Vector)
 	}
 	if argc < 3 {
 		// use current location as origin
 		origin = p.Location
+	} else {
+		origin = a[2].(*Vector)
 	}
 	coordinates := p.Plane()
 	coordinates.Rotate(gp.NewAx1(origin.ToPoint(), gp.NewDirVec(axis.ToVector())), utils.ToRadians(degrees))
