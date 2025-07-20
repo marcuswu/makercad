@@ -6,8 +6,8 @@ import (
 	"slices"
 
 	floatUtils "github.com/marcuswu/dlineate/utils"
-	"github.com/marcuswu/libmakercad/internal/utils"
 	"github.com/marcuswu/libmakercad/pkg/sketch"
+	"github.com/marcuswu/libmakercad/utils"
 	"github.com/rs/zerolog/log"
 
 	"github.com/marcuswu/gooccwrapper/brepadapter"

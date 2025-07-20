@@ -47,4 +47,5 @@ type SketchSolver interface {
 	OverConstrained() []string
 	Entities() []Entity
 	LogDebug(string) error
+	ExportImage(string, ...float64) error
 }

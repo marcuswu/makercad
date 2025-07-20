@@ -48,6 +48,10 @@ func (s *Sketch) DebugGraph(file string) error {
 	return s.solver.LogDebug(file)
 }
 
+func (s *Sketch) ExportImage(file string, args ...float64) error {
+	return s.solver.ExportImage(file, args...)
+}
+
 func (s *Sketch) Project(edge *sketch.Edge) sketch.Entity {
 	if edge.IsCircle() {
 		return edge.GetCircle(s.solver)

@@ -234,28 +234,25 @@ func (s *DlineateSolver) Equal(e1 Entity, e2 Entity) {
 }
 
 func (s *DlineateSolver) CurveDiameter(e Entity, d float64) {
-	if a, ok := e.(*Arc); ok {
+	a, aok := e.(*Arc)
+	c, cok := e.(*Circle)
+	if aok {
 		log.Debug().
 			Uint("center", a.Center.getElement().ID()).
 			Uint("start", a.Start.getElement().ID()).
 			Uint("end", a.End.getElement().ID()).
 			Float64("radius", d/2).
 			Msg("Setting arc diameter")
-		s.system.AddDistanceConstraint(a.Center.getElement(), a.Start.getElement(), d/2)
-		s.system.AddDistanceConstraint(a.Center.getElement(), a.End.getElement(), d/2)
-		return
 	}
-	c, ok := e.(*Circle)
-	if !ok {
-		return
+	if cok {
+		log.Debug().
+			Uint("center", c.Center.getElement().ID()).
+			Float64("diameter", d).
+			Msg("Setting circle diameter")
 	}
-	log.Debug().
-		Uint("center", c.Center.getElement().ID()).
-		Float64("diameter", d).
-		Msg("Setting circle diameter")
-	// This is a special constraint -- it's possible nothing relies on the circle's diameter
-	// It's also possible something is coincident with it. We'll have to resolve that at solve time
-	s.system.AddDistanceConstraint(c.getElement(), nil, d/2)
+	if aok || cok {
+		s.system.AddDistanceConstraint(e.getElement(), nil, d/2)
+	}
 }
 
 func (s *DlineateSolver) CoordinateSystem() gp.Ax3 {
@@ -292,4 +289,8 @@ func (s *DlineateSolver) OverConstrained() []string {
 
 func (s *DlineateSolver) LogDebug(file string) error {
 	return s.system.ExportGraphViz(file)
+}
+
+func (s *DlineateSolver) ExportImage(file string, args ...float64) error {
+	return s.system.ExportImage(file, args...)
 }

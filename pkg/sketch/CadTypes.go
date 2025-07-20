@@ -3,7 +3,7 @@ package sketch
 import (
 	"fmt"
 
-	"github.com/marcuswu/libmakercad/internal/utils"
+	"github.com/marcuswu/libmakercad/utils"
 
 	"github.com/marcuswu/gooccwrapper/gp"
 )
@@ -57,7 +57,7 @@ func NewPlaneParameters() *PlaneParameters {
 func NewPlaneParametersFromCoordinateSystem(coord gp.Ax3) *PlaneParameters {
 	return &PlaneParameters{
 		NewVector(coord.Location()),
-		NewVector(NewVector(coord.YDirection()).ToVector().Crossed(NewVector(coord.XDirection()).ToVector())),
+		NewVector(coord.Direction()),
 		NewVector(coord.XDirection()),
 	}
 }
