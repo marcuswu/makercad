@@ -14,3 +14,4 @@
   - [ ] Implement interfaces in CadTypes.go
   - [ ] Add stl / step export
 - [ ] Memory management!
+  - [ ] Use runtime.AddCleanup

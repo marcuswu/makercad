@@ -1,7 +1,6 @@
 package sketch
 
 import (
-	"log"
 	"slices"
 
 	"github.com/marcuswu/dlineate/utils"
@@ -189,10 +188,12 @@ func (e *Edge) GetCircle(solver SketchSolver) *Circle {
 	radius := circle.Radius()
 
 	circ := solver.CreateCircle(centerX, centerY, radius)
-	log.Println("Adding projected circle vertical distance constraint")
-	circ.Center.VerticalDistance(solver.XAxis(), centerY)
-	log.Println("Adding projected circle horizontal distance constraint")
-	circ.Center.HorizontalDistance(solver.YAxis(), centerX)
+	if utils.StandardFloatCompare(gp.NewVec(centerX, centerY, 0).Magnitude(), 0.0) == 0 {
+		circ.Center.Coincident(solver.Origin())
+	} else {
+		circ.Center.VerticalDistance(solver.XAxis(), centerY)
+		circ.Center.HorizontalDistance(solver.YAxis(), centerX)
+	}
 	circ.Diameter(radius * 2)
 	solver.MakeFixed(circ)
 	return circ
