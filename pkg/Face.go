@@ -116,12 +116,58 @@ func (l ListOfFace) Edges() sketch.ListOfEdge {
 	return le
 }
 
-func NewFace(sketch *Sketch) *Face {
+func NewFace(s *Sketch) *Face {
 	brepbuilderapi.SetPrecision(0.0001)
 	wires := make([]topods.Wire, 0)
-	entities := sketch.solver.Entities()
-	for i := range entities {
-		entity := entities[i]
+	entities := s.solver.Entities()
+	wired := make([]sketch.Entity, 0, len(entities))
+
+	if len(entities) == 0 {
+		return nil
+	}
+
+	connectsToWire := func(e sketch.Entity) bool {
+		for _, ent := range wired {
+			if ent.IsConnectedTo(e) {
+				return true
+			}
+		}
+		return false
+	}
+
+	addConnectedEntities := func() {
+		for i := len(entities) - 1; i >= 0; i-- {
+			ent := entities[i]
+			// We don't care about construction geometry
+			if ent.IsConstruction() {
+				entities[i] = entities[len(entities)-1]
+				entities = entities[:len(entities)-1]
+				continue
+			}
+			// Come back to unconnected geometry later unless it's our first entity
+			if len(wired) > 0 && !connectsToWire(ent) {
+				continue
+			}
+			// Add the connected geometry to our wire list and remove it from available entities
+			wired = append(wired, ent)
+			entities[i] = entities[len(entities)-1]
+			entities = entities[:len(entities)-1]
+		}
+	}
+
+	// Pass through twice; if we still have entities, try adding directly
+	// TODO: Think about this and test some more. There's probably a better way to check completion
+	addConnectedEntities()
+	addConnectedEntities()
+
+	for _, entity := range entities {
+		if entity.IsConstruction() {
+			continue
+		}
+		wired = append(wired, entity)
+	}
+
+	for _, entity := range wired {
 		if entity.IsConstruction() {
 			continue
 		}

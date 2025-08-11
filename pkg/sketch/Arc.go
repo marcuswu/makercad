@@ -1,6 +1,8 @@
 package sketch
 
 import (
+	"fmt"
+
 	"github.com/marcuswu/dlineate"
 	"github.com/marcuswu/gooccwrapper/brepbuilderapi"
 	"github.com/marcuswu/gooccwrapper/geom"
@@ -57,4 +59,28 @@ func (a *Arc) UpdateFromValues() {
 	a.Center.UpdateFromValues()
 	a.Start.UpdateFromValues()
 	a.End.UpdateFromValues()
+}
+
+func (a *Arc) String() string {
+	return fmt.Sprintf("%v to %v around %v", a.Start.String(), a.End.String(), a.Center.String())
+}
+
+func (a *Arc) IsConnectedTo(other Entity) bool {
+	switch o := other.(type) {
+	case *Point:
+		return o.IsConnectedTo(a.Start) || o.IsConnectedTo(a.End)
+	case *Line:
+		return o.Start.IsConnectedTo(a.Start) ||
+			o.Start.IsConnectedTo(a.End) ||
+			o.End.IsConnectedTo(a.Start) ||
+			o.End.IsConnectedTo(a.End)
+	case *Arc:
+		return o.Start.IsConnectedTo(a.Start) ||
+			o.Start.IsConnectedTo(a.End) ||
+			o.End.IsConnectedTo(a.Start) ||
+			o.End.IsConnectedTo(a.End)
+	case *Circle:
+		return o.IsConnectedTo(a.Start) || o.IsConnectedTo(a.End)
+	}
+	return false
 }

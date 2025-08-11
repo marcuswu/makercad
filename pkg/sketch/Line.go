@@ -2,10 +2,10 @@ package sketch
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/marcuswu/gooccwrapper/brepbuilderapi"
 	"github.com/marcuswu/gooccwrapper/geom"
+	"github.com/rs/zerolog/log"
 
 	"github.com/marcuswu/dlineate"
 )
@@ -71,7 +71,7 @@ func (l *Line) MakeEdge() *Edge {
 	if start.Distance(end) == 0 {
 		return nil
 	}
-	log.Printf("Making edge from line %s\n", l.String())
+	log.Debug().Str("Line", l.String()).Msg("Making edge")
 	segment := geom.MakeSegment(start, end)
 	return &Edge{brepbuilderapi.NewMakeEdge(segment).ToTopoDSEdge()}
 }
@@ -82,5 +82,25 @@ func (l *Line) UpdateFromValues() {
 }
 
 func (l *Line) String() string {
-	return fmt.Sprintf("Line: %v to %v", l.Start.ToString(), l.End.ToString())
+	return fmt.Sprintf("%v to %v", l.Start.String(), l.End.String())
+}
+
+func (l *Line) IsConnectedTo(other Entity) bool {
+	switch o := other.(type) {
+	case *Point:
+		return o.IsConnectedTo(l.Start) || o.IsConnectedTo(l.End)
+	case *Arc:
+		return o.Start.IsConnectedTo(l.Start) ||
+			o.Start.IsConnectedTo(l.End) ||
+			o.End.IsConnectedTo(l.Start) ||
+			o.End.IsConnectedTo(l.End)
+	case *Line:
+		return o.Start.IsConnectedTo(l.Start) ||
+			o.Start.IsConnectedTo(l.End) ||
+			o.End.IsConnectedTo(l.Start) ||
+			o.End.IsConnectedTo(l.End)
+	case *Circle:
+		return o.IsConnectedTo(l)
+	}
+	return false
 }

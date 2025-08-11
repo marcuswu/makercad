@@ -168,6 +168,14 @@ func (*MakerCad) Remove(target Shape, tools ListOfShape) (*CadOperation, error) 
 	return NewCadOperation(tools, &operation), nil
 }
 
+func (*MakerCad) Chamfer(target Shape, edges sketch.ListOfEdge, depth float64) (Shape, error) {
+	fillet := brepfilletapi.NewMakeChamfer(topods.TopoDSShape(target.Shape.Shape))
+	for _, e := range edges {
+		fillet.AddEdge(topods.TopoDSEdge(e.Edge.Edge), depth)
+	}
+	return Shape{fillet.Shape()}, nil
+}
+
 func (*MakerCad) Fillet(target Shape, edges sketch.ListOfEdge, radius float64) (Shape, error) {
 	fillet := brepfilletapi.NewMakeFillet(topods.TopoDSShape(target.Shape.Shape))
 	for _, e := range edges {

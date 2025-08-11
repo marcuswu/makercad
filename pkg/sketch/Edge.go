@@ -44,6 +44,12 @@ func (l ListOfEdge) IsLine() ListOfEdge {
 	})
 }
 
+func (l ListOfEdge) IsCircle() ListOfEdge {
+	return l.Matching(func(e *Edge) bool {
+		return e.IsCircle()
+	})
+}
+
 func (l ListOfEdge) Length(length float64) ListOfEdge {
 	return l.Matching(func(e *Edge) bool {
 		return utils.FloatCompare(e.LineLength(), length, utils.StandardCompare) == 0

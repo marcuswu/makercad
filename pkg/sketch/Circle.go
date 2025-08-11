@@ -55,3 +55,17 @@ func (c *Circle) MakeEdge() *Edge {
 	circle := geom.MakeCircle(center, radius)
 	return &Edge{brepbuilderapi.NewMakeEdge(circle).ToTopoDSEdge()}
 }
+
+func (c *Circle) IsConnectedTo(other Entity) bool {
+	switch o := other.(type) {
+	case *Point:
+		return c.Center.IsDistanceFrom(o, c.Radius)
+	case *Line:
+		return c.Center.IsDistanceFrom(o.Start, c.Radius) || c.Center.IsDistanceFrom(o.End, c.Radius)
+	case *Arc:
+		return c.Center.IsDistanceFrom(o.Start, c.Radius) || c.Center.IsDistanceFrom(o.End, c.Radius)
+	case *Circle:
+		return c.Center.IsDistanceFrom(o.Center, c.Radius+o.Radius)
+	}
+	return false
+}

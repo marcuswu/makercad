@@ -13,6 +13,7 @@ type Entity interface {
 	UpdateFromValues()
 	IsConstruction() bool
 	SetConstruction(bool)
+	IsConnectedTo(Entity) bool
 }
 
 func AsArc(e Entity) *Arc {

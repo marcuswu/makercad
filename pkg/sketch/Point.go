@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/marcuswu/dlineate"
+	"github.com/marcuswu/dlineate/utils"
 	"github.com/marcuswu/gooccwrapper/gp"
 )
 
@@ -82,8 +83,8 @@ func (p *Point) VerticalDistance(other Entity, distance float64) *Point {
 	return p
 }
 
-func (p *Point) ToString() string {
-	return fmt.Sprintf("%f, %f", p.X, p.Y)
+func (p *Point) String() string {
+	return fmt.Sprintf("(%f, %f)", p.X, p.Y)
 }
 
 func (p *Point) Convert() gp.Pnt {
@@ -101,4 +102,22 @@ func (p *Point) UpdateFromValues() {
 
 func (p *Point) MakeEdge() *Edge {
 	return nil
+}
+
+func (p *Point) IsDistanceFrom(other *Point, dist float64) bool {
+	return utils.StandardFloatCompare(p.DistanceBetweenPoints(&other.Element), dist) == 0
+}
+
+func (p *Point) IsConnectedTo(other Entity) bool {
+	switch o := other.(type) {
+	case *Point:
+		return utils.StandardFloatCompare(p.X, o.X) == 0 && utils.StandardFloatCompare(p.Y, o.Y) == 0
+	case *Line:
+		return o.IsConnectedTo(p)
+	case *Arc:
+		return o.IsConnectedTo(p)
+	case *Circle:
+		return o.IsConnectedTo(p)
+	}
+	return false
 }

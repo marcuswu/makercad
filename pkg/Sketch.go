@@ -24,6 +24,7 @@ func (s *Sketch) YAxis() *sketch.Line {
 	return s.solver.YAxis()
 }
 
+// Arc creates an arc clockwise from start to end around center
 func (s *Sketch) Arc(centerX float64, centerY float64, startX float64, startY float64, endX float64, endY float64) *sketch.Arc {
 	return s.solver.CreateArc(centerX, centerY, startX, startY, endX, endY)
 }
