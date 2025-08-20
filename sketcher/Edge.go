@@ -11,6 +11,7 @@ import (
 	"github.com/marcuswu/gooccwrapper/topods"
 )
 
+// Edge is a component for construction of a Face. A slice of Edges can be filtered and sorted
 type Edge struct {
 	Edge topods.Edge
 }
@@ -19,7 +20,8 @@ type ListOfEdge []*Edge
 type EdgeFilter func(*Edge) bool
 type EdgeSorter func(a, b *Edge) int
 
-func (l ListOfEdge) First(filter EdgeFilter) *Edge {
+// FirstMatching returns the first edge in the list matching the supplied filter
+func (l ListOfEdge) FirstMatching(filter EdgeFilter) *Edge {
 	for _, edge := range l {
 		if filter(edge) {
 			return edge
@@ -28,6 +30,7 @@ func (l ListOfEdge) First(filter EdgeFilter) *Edge {
 	return nil
 }
 
+// Matching returns the edges in the list matching the supplied filter
 func (l ListOfEdge) Matching(filter EdgeFilter) ListOfEdge {
 	newList := make(ListOfEdge, 0, len(l))
 	for _, edge := range l {
@@ -38,34 +41,40 @@ func (l ListOfEdge) Matching(filter EdgeFilter) ListOfEdge {
 	return newList
 }
 
+// IsLine filters the list by edges which are lines
 func (l ListOfEdge) IsLine() ListOfEdge {
 	return l.Matching(func(e *Edge) bool {
 		return e.IsLine()
 	})
 }
 
+// IsCircle filters the list by edges which are circles
 func (l ListOfEdge) IsCircle() ListOfEdge {
 	return l.Matching(func(e *Edge) bool {
 		return e.IsCircle()
 	})
 }
 
+// Length filters the list by edges which have the supplied length
 func (l ListOfEdge) Length(length float64) ListOfEdge {
 	return l.Matching(func(e *Edge) bool {
 		return utils.FloatCompare(e.LineLength(), length, utils.StandardCompare) == 0
 	})
 }
 
+// Parallel filters the list by edges which are parallel with the supplied vector
 func (l ListOfEdge) Parallel(dir gp.Dir) ListOfEdge {
 	return l.Matching(func(e *Edge) bool {
 		return e.IsParallel(dir)
 	})
 }
 
+// Sort sorts the edges by the provided sorter function
 func (l ListOfEdge) Sort(sorter EdgeSorter) {
 	slices.SortFunc(l, sorter)
 }
 
+// SortByLength sorts the edge list by length
 func (l ListOfEdge) SortByLength(inverse bool) {
 	l.Sort(func(a, b *Edge) int {
 		aL := a.LineLength()
@@ -77,6 +86,7 @@ func (l ListOfEdge) SortByLength(inverse bool) {
 	})
 }
 
+// SortByX sorts the edge the X position of the first vertex of the edge
 func (l ListOfEdge) SortByX(inverse bool) {
 	l.Sort(func(a, b *Edge) int {
 		aX := a.FirstVertex().X()
@@ -88,6 +98,7 @@ func (l ListOfEdge) SortByX(inverse bool) {
 	})
 }
 
+// SortByY sorts the edge the Y position of the first vertex of the edge
 func (l ListOfEdge) SortByY(inverse bool) {
 	l.Sort(func(a, b *Edge) int {
 		aY := a.FirstVertex().Y()
@@ -99,6 +110,7 @@ func (l ListOfEdge) SortByY(inverse bool) {
 	})
 }
 
+// SortByZ sorts the edge the Z position of the first vertex of the edge
 func (l ListOfEdge) SortByZ(inverse bool) {
 	l.Sort(func(a, b *Edge) int {
 		aZ := a.FirstVertex().Z()
@@ -114,21 +126,25 @@ func NewEdgeFromRef(shape topods.Shape) *Edge {
 	return &Edge{topods.NewEdgeFromRef(topods.TopoDSEdge(shape.Shape))}
 }
 
+// IsLine returns whether this edge is a line
 func (e *Edge) IsLine() bool {
 	curve := brepadapter.NewCurve(e.Edge)
 	return curve.IsLine()
 }
 
+// IsCircle returns whether this edge is a circle
 func (e *Edge) IsCircle() bool {
 	curve := brepadapter.NewCurve(e.Edge)
 	return curve.IsCircle()
 }
 
+// IsEllipse returns whether this edge is a ellipse
 func (e *Edge) IsEllipse() bool {
 	curve := brepadapter.NewCurve(e.Edge)
 	return curve.IsEllipse()
 }
 
+// FirstVertex returns the first vertex of the edge
 func (e *Edge) FirstVertex() gp.Pnt {
 	verts := e.Vertexes()
 	if len(verts) < 1 {
@@ -138,6 +154,7 @@ func (e *Edge) FirstVertex() gp.Pnt {
 	return verts[0].ToPoint()
 }
 
+// LastVertex returns the last vertex of the edge
 func (e *Edge) LastVertex() gp.Pnt {
 	verts := e.Vertexes()
 	if len(verts) < 1 {
@@ -160,6 +177,7 @@ func (e *Edge) projectPointToSketch(solver SketchSolver, point gp.Pnt) (float64,
 	return x, y
 }
 
+// GetLine projects this edge to the specified sketch if it is a Line
 func (e *Edge) GetLine(solver SketchSolver) *Line {
 	if !e.IsLine() {
 		return nil
@@ -179,10 +197,12 @@ func (e *Edge) GetLine(solver SketchSolver) *Line {
 	return line
 }
 
+// LineLength returns the length of the edge
 func (e *Edge) LineLength() float64 {
 	return gcpnts.CurveLength(brepadapter.NewCurve(e.Edge))
 }
 
+// GetCircle projects this edge to the specified sketch if it is a Circle (always creates a circle, not an ellipse)
 func (e *Edge) GetCircle(solver SketchSolver) *Circle {
 	if !e.IsCircle() {
 		return nil
@@ -205,6 +225,7 @@ func (e *Edge) GetCircle(solver SketchSolver) *Circle {
 	return circ
 }
 
+// CircleRadius returns the radius of this edge if it is a circle
 func (e *Edge) CircleRadius() float64 {
 	if !e.IsCircle() {
 		return 0.0
@@ -216,6 +237,7 @@ func (e *Edge) CircleRadius() float64 {
 	return circle.Radius()
 }
 
+// IsParallel returns whether this edge is parallel to a vector
 func (e *Edge) IsParallel(v gp.Dir) bool {
 	if !e.IsLine() {
 		return false
@@ -232,6 +254,7 @@ func (e *Edge) IsParallel(v gp.Dir) bool {
 	return dir.IsParallel(v)
 }
 
+// Midpoint returns the midpoint of a line (or origin if it is not a line)
 func (e *Edge) Midpoint() gp.Pnt {
 	if !e.IsLine() {
 		return gp.NewPnt(0, 0, 0)
@@ -246,6 +269,7 @@ func (e *Edge) Midpoint() gp.Pnt {
 	return gp.NewPnt((last.X()+first.X())/2., (last.Y()+first.Y())/2., (last.Z()+first.Z())/2.)
 }
 
+// Vertexes returns the vertexes that make up this edge
 func (e *Edge) Vertexes() ListOfVertex {
 	edges := make(ListOfVertex, 0)
 	explorer := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(e.Edge.Edge)), topexp.Vertex)

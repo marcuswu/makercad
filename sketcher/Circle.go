@@ -9,6 +9,7 @@ import (
 	"github.com/marcuswu/gooccwrapper/gp"
 )
 
+// Circle represents a 2D circle on a sketch plane
 type Circle struct {
 	dlineate.Element
 	solver         SketchSolver
@@ -17,10 +18,12 @@ type Circle struct {
 	isConstruction bool
 }
 
+// IsConstruction returns whether this element is construction geometry
 func (c *Circle) IsConstruction() bool {
 	return c.isConstruction
 }
 
+// SetConstruction sets the element as construction geometry
 func (c *Circle) SetConstruction(isConstruction bool) {
 	c.isConstruction = isConstruction
 }
@@ -29,24 +32,29 @@ func (c *Circle) getElement() *dlineate.Element {
 	return &c.Element
 }
 
+// Diameter creates a constraint specifying the circle's diameter
 func (c *Circle) Diameter(d float64) *Circle {
 	c.solver.CurveDiameter(c, d)
 
 	return c
 }
 
+// Equal returns whether this element is equal to another
 func (c *Circle) Equal(other *Circle) *Circle {
 	c.solver.Equal(c, other)
 
 	return c
 }
 
+// UpdateFromValues updates the element's center, start, and end based on the current sketch values
+// Automatically called when the sketch is solved
 func (c *Circle) UpdateFromValues() {
 	values := c.Element.Values()
 	c.Center.UpdateFromValues()
 	c.Radius = values[2]
 }
 
+// MakeEdge generates an edge from the sketch element. Usually this is handled by MakerCad.
 func (c *Circle) MakeEdge() *Edge {
 	log.Printf("Making edge from circle %s\n", c.String())
 	centerPoint := gp.NewPnt(c.Center.X, c.Center.Y, 0.0)
@@ -56,6 +64,7 @@ func (c *Circle) MakeEdge() *Edge {
 	return &Edge{brepbuilderapi.NewMakeEdge(circle).ToTopoDSEdge()}
 }
 
+// IsConnectedTo returns whether this entity is connected to the supplied entity
 func (c *Circle) IsConnectedTo(other Entity) bool {
 	switch o := other.(type) {
 	case *Point:

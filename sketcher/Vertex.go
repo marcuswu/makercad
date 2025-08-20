@@ -7,6 +7,7 @@ import (
 	"github.com/marcuswu/gooccwrapper/topods"
 )
 
+// Vertex is the base type for Point
 type Vertex struct {
 	Vertex topods.Vertex
 }

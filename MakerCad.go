@@ -28,6 +28,8 @@ const (
 
 const StepExportSuccess = 1
 
+// MakerCad contains the origin planes (there's probably a better mathematical term) and all sketches created with an instance.
+// Create an instance with [NewMakerCad] to ensure the planes are initialized.
 type MakerCad struct {
 	sketches    []*Sketch
 	FrontPlane  *sketcher.PlaneParameters
@@ -38,6 +40,7 @@ type MakerCad struct {
 	RightPlane  *sketcher.PlaneParameters
 }
 
+// NewMakerCad Creates a MakerCad instance and initializes the predefined planes
 func NewMakerCad() *MakerCad {
 	return &MakerCad{
 		sketches: make([]*Sketch, 0),
@@ -74,12 +77,14 @@ func NewMakerCad() *MakerCad {
 	}
 }
 
+// Sketch creates a new sketch on the provided plane.
 func (m *MakerCad) Sketch(planer sketcher.Planer) *Sketch {
 	sketch := &Sketch{sketcher.NewDlineateSolver(planer)}
 	m.sketches = append(m.sketches, sketch)
 	return sketch
 }
 
+// ExportStl exports a list of shapes to an STL file with the provided quality setting
 func (*MakerCad) ExportStl(filename string, shapes ListOfShape, quality ExportQuality) error {
 	linear := 0.01
 	angular := 0.1
@@ -113,6 +118,7 @@ func (*MakerCad) ExportStl(filename string, shapes ListOfShape, quality ExportQu
 	return nil
 }
 
+// ExportStep exports a list of shapes to a Step file
 func (*MakerCad) ExportStep(filename string, shapes ListOfShape) error {
 	writer := stepcontrol.NewWriter()
 
@@ -128,6 +134,7 @@ func (*MakerCad) ExportStep(filename string, shapes ListOfShape) error {
 	return nil
 }
 
+// MakeBox creates a rectangular prism on the specified plane with the provided dimensions optionally centering it on the origin of the plane
 func (*MakerCad) MakeBox(plane sketcher.Planer, dx, dy, dz float64, centerXY bool) Shape {
 	p := plane.Plane()
 	origin := p.Location()
@@ -138,12 +145,14 @@ func (*MakerCad) MakeBox(plane sketcher.Planer, dx, dy, dz float64, centerXY boo
 	return Shape{brepprimapi.NewMakeBox(position, dx, dy, dz).Shape()}
 }
 
+// MakeCylinder creates a cylinder at the location and orientation provided by the plane with the specified radius and height
 func (*MakerCad) MakeCylinder(plane sketcher.Planer, radius, height float64) Shape {
 	p := plane.Plane()
 	position := gp.NewAx2(p.Location(), p.Direction(), p.XDirection())
 	return Shape{brepprimapi.NewMakeCylinder(position, radius, height).Shape()}
 }
 
+// Combine performs a boolean union of the target and the provided tools
 func (*MakerCad) Combine(target Shape, tools ListOfShape) (*CadOperation, error) {
 	operation := brepalgoapi.NewFuse().ToBooleanOperation()
 	arguments := toptools.NewListOfShape()
@@ -156,6 +165,7 @@ func (*MakerCad) Combine(target Shape, tools ListOfShape) (*CadOperation, error)
 	return NewCadOperation(tools, &operation), nil
 }
 
+// Remove performs a boolean difference from the target with the provided tools
 func (*MakerCad) Remove(target Shape, tools ListOfShape) (*CadOperation, error) {
 	operation := brepalgoapi.NewCut().ToBooleanOperation()
 	arguments := toptools.NewListOfShape()
@@ -168,6 +178,7 @@ func (*MakerCad) Remove(target Shape, tools ListOfShape) (*CadOperation, error) 
 	return NewCadOperation(tools, &operation), nil
 }
 
+// Chamfer performs a 45 degree Chamfer of the supplied shape and edges to the specified depth
 func (*MakerCad) Chamfer(target Shape, edges sketcher.ListOfEdge, depth float64) (Shape, error) {
 	fillet := brepfilletapi.NewMakeChamfer(topods.TopoDSShape(target.Shape.Shape))
 	for _, e := range edges {
@@ -176,6 +187,7 @@ func (*MakerCad) Chamfer(target Shape, edges sketcher.ListOfEdge, depth float64)
 	return Shape{fillet.Shape()}, nil
 }
 
+// Fillet performs a spherical Fillet of the supplied shape and edges to the specified radius
 func (*MakerCad) Fillet(target Shape, edges sketcher.ListOfEdge, radius float64) (Shape, error) {
 	fillet := brepfilletapi.NewMakeFillet(topods.TopoDSShape(target.Shape.Shape))
 	for _, e := range edges {

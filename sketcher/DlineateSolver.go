@@ -77,23 +77,6 @@ func (s *DlineateSolver) CreateArc(centerX float64, centerY float64, startX floa
 	return entity
 }
 
-/*
-func (s *DlineateSolver) CreateDistance(float64) *Distance {
-}
-
-func (s *DlineateSolver) CreateWorkplanePoint(x float64, y float64) *Point {
-}
-
-func (s *DlineateSolver) CreateWorkplaneLine(*Point, *Point) *Line {
-}
-
-func (s *DlineateSolver) CreateWorkplaneCircle(*Point, float64) *Circle {
-}
-
-func (s *DlineateSolver) CreateWorkplaneArc(*Point, *Point, *Point) *Arc {
-}
-*/
-
 func (s *DlineateSolver) Coincident(e1 Entity, e2 Entity) {
 	_, isE1Point := e1.(*Point)
 	_, isE2Point := e2.(*Point)

@@ -35,16 +35,19 @@ const (
 	External
 )
 
+// Face represents a surface on a 3D [Shape]
 type Face struct {
 	face topods.Face
 }
 
+// ListOfFace is a filterable and sortable slice of [Face]
 type ListOfFace []*Face
 
 type FaceFilter func(*Face) bool
 type FaceSorter func(a, b *Face) int
 
-func (l ListOfFace) First(filter FaceFilter) *Face {
+// FirstMatching returns the first Face matching the provided filter
+func (l ListOfFace) FirstMatching(filter FaceFilter) *Face {
 	for _, face := range l {
 		if filter(face) {
 			return face
@@ -53,6 +56,7 @@ func (l ListOfFace) First(filter FaceFilter) *Face {
 	return nil
 }
 
+// Matching returns the Faces matching the provided filter
 func (l ListOfFace) Matching(filter FaceFilter) ListOfFace {
 	newList := make(ListOfFace, 0, len(l))
 	for _, face := range l {
@@ -63,18 +67,22 @@ func (l ListOfFace) Matching(filter FaceFilter) ListOfFace {
 	return newList
 }
 
+// Sort sorts the list of faces by the sorter
 func (l ListOfFace) Sort(sorter FaceSorter) {
 	slices.SortFunc(l, sorter)
 }
 
+// Planar filters out faces which are not planar
 func (l ListOfFace) Planar() ListOfFace {
 	return l.Matching(func(f *Face) bool { return f.IsPlanar() })
 }
 
+// AlignedWith filters out faces which do not have a parallel normal to the provided plane
 func (l ListOfFace) AlignedWith(plane *sketcher.PlaneParameters) ListOfFace {
 	return l.Matching(func(f *Face) bool { return f.IsAlignedWithPlane(plane) })
 }
 
+// Sort faces by the X position of their center
 func (l ListOfFace) SortByX(inverse bool) {
 	l.Sort(func(a, b *Face) int {
 		aX := a.getCenter().X()
@@ -86,6 +94,7 @@ func (l ListOfFace) SortByX(inverse bool) {
 	})
 }
 
+// Sort faces by the Y position of their center
 func (l ListOfFace) SortByY(inverse bool) {
 	l.Sort(func(a, b *Face) int {
 		aY := a.getCenter().Y()
@@ -97,6 +106,7 @@ func (l ListOfFace) SortByY(inverse bool) {
 	})
 }
 
+// Sort faces by the Z position of their center
 func (l ListOfFace) SortByZ(inverse bool) {
 	l.Sort(func(a, b *Face) int {
 		aZ := a.getCenter().Z()
@@ -108,6 +118,7 @@ func (l ListOfFace) SortByZ(inverse bool) {
 	})
 }
 
+// Return the edges which are contained within this Face
 func (l ListOfFace) Edges() sketcher.ListOfEdge {
 	le := sketcher.ListOfEdge{}
 	for _, e := range l {
@@ -116,6 +127,8 @@ func (l ListOfFace) Edges() sketcher.ListOfEdge {
 	return le
 }
 
+// NewFace creates a face based on the provided sketch. Ignores construction entities and any entities which do not create a Wire (like Points).
+// NewFace attempts to create the face by edges ordered by connectivity. If it cannot determine order by connectivity, a non-manifold Face may be returned.
 func NewFace(s *Sketch) *Face {
 	brepbuilderapi.SetPrecision(0.0001)
 	wires := make([]topods.Wire, 0)
@@ -200,6 +213,7 @@ func (f *Face) getCenter() gp.Pnt {
 	return shellProps.CenterOfMass()
 }
 
+// Plane returns the plane this Face is on
 func (f *Face) Plane() gp.Ax3 {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
@@ -218,6 +232,7 @@ func (f *Face) Plane() gp.Ax3 {
 	return facePlane.Plane()
 }
 
+// Normal returns the normal direction of the Face
 func (f *Face) Normal() gp.Dir {
 	umin, _, vmin, _ := breptools.UVBounds(f.face)
 	surface := f.face.Surface()
@@ -229,11 +244,14 @@ func (f *Face) Normal() gp.Dir {
 	return normal
 }
 
+// Revolve creates a 3D shape by revolving this face around the provided axis by the specified angle in radians. Creates a new Shape.
 func (f *Face) Revolve(axis *sketcher.Line, angle float64) (*CadOperation, error) {
 	list := toptools.NewListOfShape()
 	return f.RevolveMerging(axis, angle, MergeTypeNew, list)
 }
 
+// RevolveMerging creates a 3D shape by revolving this face around the provided axis by the specified angle
+// in radians and performs the specified boolean operation with the shapes in the provided list
 func (f *Face) RevolveMerging(axis *sketcher.Line, angle float64, merge MergeType, list toptools.ListOfShape) (*CadOperation, error) {
 	if !f.IsPlanar() {
 		return nil, errors.New("cannot revolve non-planar face")
@@ -265,11 +283,14 @@ func (f *Face) RevolveMerging(axis *sketcher.Line, angle float64, merge MergeTyp
 	return &CadOperation{[]Shape{{shape}}, operation}, nil
 }
 
+// Extrude creates a prism using this Face along its normal by distance
 func (f *Face) Extrude(distance float64) *CadOperation {
 	list := toptools.NewListOfShape()
 	return f.ExtrudeMerging(distance, MergeTypeNew, list)
 }
 
+// ExtrudeMerging creates a prism using this Face along its normal by distance using the specified boolean operation
+// to merge the result with the list of provided shapes
 func (f *Face) ExtrudeMerging(distance float64, merge MergeType, list toptools.ListOfShape) *CadOperation {
 	if !f.IsPlanar() {
 		return nil
@@ -308,14 +329,17 @@ func mergeTypeToOperation(merge MergeType) *brepalgoapi.Boolean {
 	return &boolOp
 }
 
+// GetFace returns the OpenCascade face reference
 func (f *Face) GetFace() topods.Face {
 	return f.face
 }
 
+// AsShape returns the 2D face as a Shape object
 func (f *Face) AsShape() *Shape {
 	return &Shape{topods.NewShapeFromRef(topods.TopoDSShape(f.face.Face))}
 }
 
+// Mirror mirrors this face across the specified plane. This may flip the normal
 func (f *Face) Mirror(plane *sketcher.PlaneParameters) (*Face, error) {
 	coord := plane.Ax2()
 	gptrans := gp.NewTrsf()
@@ -324,6 +348,7 @@ func (f *Face) Mirror(plane *sketcher.PlaneParameters) (*Face, error) {
 	return &Face{topods.NewFaceFromRef(topods.TopoDSFace(trans.Shape().Shape))}, nil
 }
 
+// HasEdge returns whether this Face contains the specified edge
 func (f *Face) HasEdge(edge topods.Edge) bool {
 	explorer := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(f.face.Face)), topexp.Edge)
 	for ; explorer.More(); explorer.Next() {
@@ -334,6 +359,7 @@ func (f *Face) HasEdge(edge topods.Edge) bool {
 	return false
 }
 
+// IsAlignedWithFace returns wither this Face and the provided Face have equivalent normals
 func (f *Face) IsAlignedWithFace(other *Face) bool {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
@@ -349,6 +375,7 @@ func (f *Face) IsAlignedWithFace(other *Face) bool {
 	return normal.IsEqual(otherNormal)
 }
 
+// IsAlignedWithPlane returns wither this Face and the provided plane have equivalent normals
 func (f *Face) IsAlignedWithPlane(plane *sketcher.PlaneParameters) bool {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
@@ -359,18 +386,21 @@ func (f *Face) IsAlignedWithPlane(plane *sketcher.PlaneParameters) bool {
 	return planeNormal.IsEqual(normal)
 }
 
+// IsConical returns whether this face is a conical face
 func (f *Face) IsConical() bool {
 	surf := geomadapter.NewSurface(f.face.Surface())
 	defer surf.Free()
 	return surf.IsConical()
 }
 
+// IsCylindrical returns whether this face is a cylindrical face
 func (f *Face) IsCylindrical() bool {
 	surf := geomadapter.NewSurface(f.face.Surface())
 	defer surf.Free()
 	return surf.IsCylindrical()
 }
 
+// IsPlanar returns whether this face is a planar face
 func (f *Face) IsPlanar() bool {
 	surf := geomadapter.NewSurface(f.face.Surface())
 	defer surf.Free()
@@ -387,6 +417,7 @@ func (f *Face) IsNormalAngle(other *Face, angle float64, tolerance float64) bool
 	) < tolerance
 }
 
+// IsOnPlane returns whether this face exists on the provided plane
 func (f *Face) IsOnPlane(plane *sketcher.PlaneParameters) bool {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
@@ -405,6 +436,7 @@ func (f *Face) IsOnPlane(plane *sketcher.PlaneParameters) bool {
 	return sameDirection && onPlane
 }
 
+// IsOpposingNormal returns whether this face and the provided face have opposing normals
 func (f *Face) IsOpposingNormal(other *Face) bool {
 	shape := topods.NewShapeFromRef(topods.TopoDSShape(f.face.Face))
 	oShape := topods.NewShapeFromRef(topods.TopoDSShape(other.face.Face))
@@ -412,6 +444,7 @@ func (f *Face) IsOpposingNormal(other *Face) bool {
 		oShape.Location().Transformation().Rotation())
 }
 
+// IsInDirection returns whether this face's normal and the provided vector are aligned
 func (f *Face) IsInDirection(x float64, y float64, z float64) bool {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
@@ -423,6 +456,7 @@ func (f *Face) IsInDirection(x float64, y float64, z float64) bool {
 	return direction.IsParallel(normal)
 }
 
+// DistanceAlong returns the distance from global origin to this face's origin along the provided vector
 func (f *Face) DistanceAlong(x float64, y float64, z float64) float64 {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
@@ -440,6 +474,7 @@ func (f *Face) DistanceAlong(x float64, y float64, z float64) float64 {
 	return direction.Dot(fromOrigin)
 }
 
+// DistanceFrom returns the distance of the face origin from a specified location
 func (f *Face) DistanceFrom(x float64, y float64, z float64) float64 {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
@@ -451,6 +486,7 @@ func (f *Face) DistanceFrom(x float64, y float64, z float64) float64 {
 	return location.Distance(gp.NewPnt(x, y, z))
 }
 
+// Edges returns the list of edges that make up the face
 func (f *Face) Edges() sketcher.ListOfEdge {
 	edges := make(sketcher.ListOfEdge, 0)
 	explorer := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(f.face.Face)), topexp.Edge)

@@ -6,6 +6,10 @@ import (
 	"github.com/marcuswu/dlineate"
 )
 
+// Entity is any element that can be used in a [Sketch]
+// Entities can be converted to [Edge]s
+// Entities can be string formatted
+// Entities can have their values updated from a [Sketch]
 type Entity interface {
 	edger
 	fmt.Stringer

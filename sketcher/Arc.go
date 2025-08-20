@@ -9,6 +9,7 @@ import (
 	"github.com/marcuswu/gooccwrapper/gp"
 )
 
+// Arc represents a 2D arc on a sketch plane
 type Arc struct {
 	dlineate.Element
 	solver         SketchSolver
@@ -18,10 +19,12 @@ type Arc struct {
 	isConstruction bool
 }
 
+// IsConstruction returns whether this element is construction geometry
 func (a *Arc) IsConstruction() bool {
 	return a.isConstruction
 }
 
+// SetConstruction sets the element as construction geometry
 func (a *Arc) SetConstruction(isConstruction bool) {
 	a.isConstruction = isConstruction
 }
@@ -30,18 +33,21 @@ func (a *Arc) getElement() *dlineate.Element {
 	return &a.Element
 }
 
+// Diameter creates a constraint specifying the arc's diameter
 func (a *Arc) Diameter(d float64) *Arc {
 	a.solver.CurveDiameter(a, d)
 
 	return a
 }
 
+// Tangent creates a constraint making the arc tangent to the specified line
 func (a *Arc) Tangent(l *Line) *Arc {
 	a.solver.ArcLineTangent(a, l)
 
 	return a
 }
 
+// MakeEdge generates an edge from the sketch element. Usually this is handled by MakerCad.
 func (a *Arc) MakeEdge() *Edge {
 	centerPoint := a.Center.Convert()
 	normalDir := a.solver.CoordinateSystem().Direction()
@@ -55,6 +61,8 @@ func (a *Arc) MakeEdge() *Edge {
 	return &Edge{brepbuilderapi.NewMakeEdge(arc).ToTopoDSEdge()}
 }
 
+// UpdateFromValues updates the arc's center, start, and end based on the current sketch values
+// Automatically called when the sketch is solved
 func (a *Arc) UpdateFromValues() {
 	a.Center.UpdateFromValues()
 	a.Start.UpdateFromValues()
@@ -65,6 +73,7 @@ func (a *Arc) String() string {
 	return fmt.Sprintf("%v to %v around %v", a.Start.String(), a.End.String(), a.Center.String())
 }
 
+// IsConnectedTo returns whether this entity is connected to the supplied entity
 func (a *Arc) IsConnectedTo(other Entity) bool {
 	switch o := other.(type) {
 	case *Point:
