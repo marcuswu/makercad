@@ -6,8 +6,8 @@ import (
 	"slices"
 
 	floatUtils "github.com/marcuswu/dlineate/utils"
-	"github.com/marcuswu/libmakercad/pkg/sketch"
-	"github.com/marcuswu/libmakercad/utils"
+	"github.com/marcuswu/makercad/sketcher"
+	"github.com/marcuswu/makercad/utils"
 	"github.com/rs/zerolog/log"
 
 	"github.com/marcuswu/gooccwrapper/brepadapter"
@@ -71,7 +71,7 @@ func (l ListOfFace) Planar() ListOfFace {
 	return l.Matching(func(f *Face) bool { return f.IsPlanar() })
 }
 
-func (l ListOfFace) AlignedWith(plane *sketch.PlaneParameters) ListOfFace {
+func (l ListOfFace) AlignedWith(plane *sketcher.PlaneParameters) ListOfFace {
 	return l.Matching(func(f *Face) bool { return f.IsAlignedWithPlane(plane) })
 }
 
@@ -108,8 +108,8 @@ func (l ListOfFace) SortByZ(inverse bool) {
 	})
 }
 
-func (l ListOfFace) Edges() sketch.ListOfEdge {
-	le := sketch.ListOfEdge{}
+func (l ListOfFace) Edges() sketcher.ListOfEdge {
+	le := sketcher.ListOfEdge{}
 	for _, e := range l {
 		le = append(le, e.Edges()...)
 	}
@@ -120,13 +120,13 @@ func NewFace(s *Sketch) *Face {
 	brepbuilderapi.SetPrecision(0.0001)
 	wires := make([]topods.Wire, 0)
 	entities := s.solver.Entities()
-	wired := make([]sketch.Entity, 0, len(entities))
+	wired := make([]sketcher.Entity, 0, len(entities))
 
 	if len(entities) == 0 {
 		return nil
 	}
 
-	connectsToWire := func(e sketch.Entity) bool {
+	connectsToWire := func(e sketcher.Entity) bool {
 		for _, ent := range wired {
 			if ent.IsConnectedTo(e) {
 				return true
@@ -203,16 +203,16 @@ func (f *Face) getCenter() gp.Pnt {
 func (f *Face) Plane() gp.Ax3 {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
-		return sketch.NewPlaneParameters().Plane()
+		return sketcher.NewPlaneParameters().Plane()
 	}
 	normal := f.Normal()
 	location := f.getCenter()
 	xDir := surface.Plane().Position().XDirection()
 
-	facePlane := sketch.NewPlaneParametersFromVectors(
-		sketch.NewVectorFromValues(location.X(), location.Y(), location.Z()),
-		sketch.NewVectorFromValues(normal.X(), normal.Y(), normal.Z()),
-		sketch.NewVectorFromValues(xDir.X(), xDir.Y(), xDir.Z()),
+	facePlane := sketcher.NewPlaneParametersFromVectors(
+		sketcher.NewVectorFromValues(location.X(), location.Y(), location.Z()),
+		sketcher.NewVectorFromValues(normal.X(), normal.Y(), normal.Z()),
+		sketcher.NewVectorFromValues(xDir.X(), xDir.Y(), xDir.Z()),
 	)
 
 	return facePlane.Plane()
@@ -229,12 +229,12 @@ func (f *Face) Normal() gp.Dir {
 	return normal
 }
 
-func (f *Face) Revolve(axis *sketch.Line, angle float64) (*CadOperation, error) {
+func (f *Face) Revolve(axis *sketcher.Line, angle float64) (*CadOperation, error) {
 	list := toptools.NewListOfShape()
 	return f.RevolveMerging(axis, angle, MergeTypeNew, list)
 }
 
-func (f *Face) RevolveMerging(axis *sketch.Line, angle float64, merge MergeType, list toptools.ListOfShape) (*CadOperation, error) {
+func (f *Face) RevolveMerging(axis *sketcher.Line, angle float64, merge MergeType, list toptools.ListOfShape) (*CadOperation, error) {
 	if !f.IsPlanar() {
 		return nil, errors.New("cannot revolve non-planar face")
 	}
@@ -312,6 +312,18 @@ func (f *Face) GetFace() topods.Face {
 	return f.face
 }
 
+func (f *Face) AsShape() *Shape {
+	return &Shape{topods.NewShapeFromRef(topods.TopoDSShape(f.face.Face))}
+}
+
+func (f *Face) Mirror(plane *sketcher.PlaneParameters) (*Face, error) {
+	coord := plane.Ax2()
+	gptrans := gp.NewTrsf()
+	gptrans.SetMirrorAx2(coord)
+	trans := brepbuilderapi.NewTransform(f.AsShape().Shape, gptrans)
+	return &Face{topods.NewFaceFromRef(topods.TopoDSFace(trans.Shape().Shape))}, nil
+}
+
 func (f *Face) HasEdge(edge topods.Edge) bool {
 	explorer := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(f.face.Face)), topexp.Edge)
 	for ; explorer.More(); explorer.Next() {
@@ -337,7 +349,7 @@ func (f *Face) IsAlignedWithFace(other *Face) bool {
 	return normal.IsEqual(otherNormal)
 }
 
-func (f *Face) IsAlignedWithPlane(plane *sketch.PlaneParameters) bool {
+func (f *Face) IsAlignedWithPlane(plane *sketcher.PlaneParameters) bool {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
 		return false
@@ -375,7 +387,7 @@ func (f *Face) IsNormalAngle(other *Face, angle float64, tolerance float64) bool
 	) < tolerance
 }
 
-func (f *Face) IsOnPlane(plane *sketch.PlaneParameters) bool {
+func (f *Face) IsOnPlane(plane *sketcher.PlaneParameters) bool {
 	surface := brepadapter.NewSurface(f.face)
 	if surface.Type() != geomabs.Plane {
 		return false
@@ -439,14 +451,14 @@ func (f *Face) DistanceFrom(x float64, y float64, z float64) float64 {
 	return location.Distance(gp.NewPnt(x, y, z))
 }
 
-func (f *Face) Edges() sketch.ListOfEdge {
-	edges := make(sketch.ListOfEdge, 0)
+func (f *Face) Edges() sketcher.ListOfEdge {
+	edges := make(sketcher.ListOfEdge, 0)
 	explorer := topexp.NewExplorer(topods.NewShapeFromRef(topods.TopoDSShape(f.face.Face)), topexp.Edge)
 	for ; explorer.More(); explorer.Next() {
 		if explorer.Depth() > 1 {
 			continue
 		}
-		edges = append(edges, sketch.NewEdgeFromRef(explorer.Current()))
+		edges = append(edges, sketcher.NewEdgeFromRef(explorer.Current()))
 	}
 
 	return edges

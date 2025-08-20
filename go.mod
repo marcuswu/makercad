@@ -1,11 +1,8 @@
-module github.com/marcuswu/libmakercad
+module github.com/marcuswu/makercad
 
 go 1.23.0
 
 toolchain go1.24.2
-
-// replace github.com/marcuswu/dlineate => /home/mwu/src/dlineate
-// replace github.com/marcuswu/gooccwrapper => /home/mwu/src/gooccwrapper
 
 require (
 	github.com/marcuswu/dlineate v0.1.6

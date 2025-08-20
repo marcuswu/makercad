@@ -1,4 +1,4 @@
-package sketch
+package sketcher
 
 import "github.com/marcuswu/gooccwrapper/gp"
 

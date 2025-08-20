@@ -1,9 +1,9 @@
-package sketch
+package sketcher
 
 import (
 	"fmt"
 
-	"github.com/marcuswu/libmakercad/utils"
+	"github.com/marcuswu/makercad/utils"
 
 	"github.com/marcuswu/gooccwrapper/gp"
 )
@@ -68,6 +68,14 @@ func NewPlaneParametersFromVectors(loc *Vector, normal *Vector, xDir *Vector) *P
 
 func (p *PlaneParameters) Plane() gp.Ax3 {
 	return gp.NewAx3(
+		p.Location.ToPoint(),
+		gp.NewDirVec(p.Normal.ToVector()),
+		gp.NewDirVec(p.X.ToVector()),
+	)
+}
+
+func (p *PlaneParameters) Ax2() gp.Ax2 {
+	return gp.NewAx2(
 		p.Location.ToPoint(),
 		gp.NewDirVec(p.Normal.ToVector()),
 		gp.NewDirVec(p.X.ToVector()),
