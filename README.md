@@ -7,7 +7,10 @@
  * [occwrapper](https://github.com/marcuswu/occwrapper) OpenCascade C wrapper to help make using OpenCascade with Go easier.
 
 ## Support
-If this project is important to you, you can help via [buy me a coffee](buymeacoffee.com/MarcusWu).
+If this project is important to you, help:
+ * Encourage me by sharing what you have made with it (hashtag #makercad)
+ * Spread usage by sharing MakerCAD with the community
+ * Help monetarily [buy me a coffee](buymeacoffee.com/MarcusWu)
 
 ## Contributing
  * Share MakerCAD with the community
