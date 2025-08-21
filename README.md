@@ -6,7 +6,16 @@
  * [OpenCascade](https://dev.opencascade.org/release) CAD Kernel - Installing a binary package is recommended (compiling takes hours).
  * [occwrapper](https://github.com/marcuswu/occwrapper) OpenCascade C wrapper to help make using OpenCascade with Go easier.
 
-### Install MakerCAD
+## Support
+If this project is important to you, you can help via [buy me a coffee](buymeacoffee.com/MarcusWu).
+
+## Contributing
+ * Share MakerCAD with the community
+ * Show off what you've built tagging #makercad
+ * Raise an issue for a problem you have encountered
+ * Submit a pull request for additions / changes / fixes you have worked on
+
+## Install MakerCAD
 Start a go project
 
 `mkdir myproject && go mod init [module-path]`
