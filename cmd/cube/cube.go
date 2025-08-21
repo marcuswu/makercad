@@ -34,7 +34,7 @@ func main() {
 
 	sketch.Solve()
 	face := makercad.NewFace(sketch)
-	cubeOp := face.Extrude(10)
+	cubeOp, _ := face.Extrude(10)
 
 	exports := make(makercad.ListOfShape, 0, 1)
 	exports = append(exports, cubeOp.Shape())
