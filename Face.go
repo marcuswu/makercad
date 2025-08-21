@@ -246,16 +246,16 @@ func (f *Face) Normal() gp.Dir {
 
 // Revolve creates a 3D shape by revolving this face around the provided axis by the specified angle in radians. Creates a new Shape.
 func (f *Face) Revolve(axis *sketcher.Line, angle float64) (*CadOperation, error) {
-	list := toptools.NewListOfShape()
-	return f.RevolveMerging(axis, angle, MergeTypeNew, list)
+	return f.RevolveMerging(axis, angle, MergeTypeNew, ListOfShape{})
 }
 
 // RevolveMerging creates a 3D shape by revolving this face around the provided axis by the specified angle
 // in radians and performs the specified boolean operation with the shapes in the provided list
-func (f *Face) RevolveMerging(axis *sketcher.Line, angle float64, merge MergeType, list toptools.ListOfShape) (*CadOperation, error) {
+func (f *Face) RevolveMerging(axis *sketcher.Line, angle float64, merge MergeType, list ListOfShape) (*CadOperation, error) {
 	if !f.IsPlanar() {
 		return nil, errors.New("cannot revolve non-planar face")
 	}
+	shapes := list.ToCascadeList()
 
 	start := axis.Start.Convert()
 	end := axis.End.Convert()
@@ -266,7 +266,7 @@ func (f *Face) RevolveMerging(axis *sketcher.Line, angle float64, merge MergeTyp
 
 	ax1 := gp.NewAx1(axis.Start.Convert(), dir)
 	shape := brepprimapi.NewMakeRevol(f.face, ax1, angle).Shape()
-	if merge == MergeTypeNew || list.Extent() < 1 {
+	if merge == MergeTypeNew || shapes.Extent() < 1 {
 		return &CadOperation{[]Shape{{shape}}, nil}, nil
 	}
 
@@ -274,7 +274,7 @@ func (f *Face) RevolveMerging(axis *sketcher.Line, angle float64, merge MergeTyp
 	tools := toptools.NewListOfShape()
 	tools.Append(shape)
 	arguments := toptools.NewListOfShape()
-	arguments.AppendList(list)
+	arguments.AppendList(shapes)
 
 	operation.SetTools(tools)
 	operation.SetArguments(arguments)
@@ -284,36 +284,36 @@ func (f *Face) RevolveMerging(axis *sketcher.Line, angle float64, merge MergeTyp
 }
 
 // Extrude creates a prism using this Face along its normal by distance
-func (f *Face) Extrude(distance float64) *CadOperation {
-	list := toptools.NewListOfShape()
-	return f.ExtrudeMerging(distance, MergeTypeNew, list)
+func (f *Face) Extrude(distance float64) (*CadOperation, error) {
+	return f.ExtrudeMerging(distance, MergeTypeNew, ListOfShape{})
 }
 
 // ExtrudeMerging creates a prism using this Face along its normal by distance using the specified boolean operation
 // to merge the result with the list of provided shapes
-func (f *Face) ExtrudeMerging(distance float64, merge MergeType, list toptools.ListOfShape) *CadOperation {
+func (f *Face) ExtrudeMerging(distance float64, merge MergeType, list ListOfShape) (*CadOperation, error) {
 	if !f.IsPlanar() {
-		return nil
+		return nil, errors.New("cannot revolve non-planar face")
 	}
 
+	shapes := list.ToCascadeList()
 	coordSystem := f.Normal()
 
 	shape := brepprimapi.NewMakePrism(f.face, gp.NewVecDir(coordSystem).Multiplied(distance)).Shape()
-	if merge == MergeTypeNew || list.Extent() < 1 {
-		return &CadOperation{[]Shape{{shape}}, nil}
+	if merge == MergeTypeNew || shapes.Extent() < 1 {
+		return &CadOperation{[]Shape{{shape}}, nil}, nil
 	}
 
 	operation := mergeTypeToOperation(merge)
 	tools := toptools.NewListOfShape()
 	tools.Append(shape)
 	arguments := toptools.NewListOfShape()
-	arguments.AppendList(list)
+	arguments.AppendList(shapes)
 
 	operation.SetTools(tools)
 	operation.SetArguments(arguments)
 	operation.Build()
 
-	return &CadOperation{[]Shape{{shape}}, operation}
+	return &CadOperation{[]Shape{{shape}}, operation}, nil
 }
 
 func mergeTypeToOperation(merge MergeType) *brepalgoapi.Boolean {
