@@ -2,12 +2,12 @@
 Free CAD software by Makers for Makers.
 
 ## The Vision ##
-Build a software CAD that:
+Build a software based CAD suite that provides:
 
-1. library that constructs relative geometry
-2. Allows for parametric modeling
-3. Allows for collaboration
-4. Allows for version control on models
+1. Relative geometry construction (build features relative to what you've already built)
+2. Parametric modeling (model based on modifiable parameters)
+3. Collaboration on modeling (git pull requests)
+4. Version control (also via git)
 
 Long term goals:
 1. Build a code editor UI (a la OpenSCAD)
