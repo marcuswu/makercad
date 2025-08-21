@@ -1,4 +1,17 @@
 # MakerCAD
+Free CAD software by Makers for Makers.
+
+## The Vision ##
+Build a software CAD that:
+
+1. library that constructs relative geometry
+2. Allows for parametric modeling
+3. Allows for collaboration
+4. Allows for version control on models
+
+Long term goals:
+1. Build a code editor UI (a la OpenSCAD)
+2. Build a UI for non-coders
 
 ## Getting Started
 
@@ -9,7 +22,7 @@
 ## Support
 If this project is important to you, help:
  * Encourage me by sharing what you have made with it (hashtag #makercad)
- * Spread usage by sharing MakerCAD with the community
+ * Encourage others by sharing MakerCAD with the community
  * Help monetarily [buy me a coffee](buymeacoffee.com/MarcusWu)
 
 ## Contributing
