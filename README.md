@@ -59,11 +59,11 @@ cad := makercad.NewMakerCad()
 #### Plane ####
 Planes can be used for creating sketches or placing primitives
 ```go
-		MyTopPlane := sketcher.NewPlaneParametersFromVectors(
-			sketcher.NewVectorFromValues(0, 0, 0),  // Location (origin for the plane)
-			sketcher.NewVectorFromValues(0, 0, 1),  // Normal (Z) direction vector
-			sketcher.NewVectorFromValues(1, 0, 0),  // X Direction vector
-		)
+MyTopPlane := sketcher.NewPlaneParametersFromVectors(
+    sketcher.NewVectorFromValues(0, 0, 0),  // Location (origin for the plane)
+    sketcher.NewVectorFromValues(0, 0, 1),  // Normal (Z) direction vector
+    sketcher.NewVectorFromValues(1, 0, 0),  // X Direction vector
+)
 ```
 
 A plane can also be created from a face of a model
@@ -255,12 +255,12 @@ someOperation.Shape().Faces().Edges().
 
 Connecting the pieces:
 ```go
-	block := cad.MakeBox(cad.TopPlane, blockWidth, blockWidth, blockHeight, true)
+  block := cad.MakeBox(cad.TopPlane, blockWidth, blockWidth, blockHeight, true)
 
-	// Find the top face aligned with Z positive
-	faces := block.Faces().AlignedWith(cad.TopPlane)
-	faces.SortByZ(true)
-	topFace := faces[0]
+  // Find the top face aligned with Z positive
+  faces := block.Faces().AlignedWith(cad.TopPlane)
+  faces.SortByZ(true)
+  topFace := faces[0]
 
   sketch := cad.Sketch(topFace)
   circle := sketch.Circle(0, 0, 5)
