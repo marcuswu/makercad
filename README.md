@@ -34,11 +34,15 @@ If this project is important to you, help:
 ## Install MakerCAD
 Start a go project
 
-`mkdir myproject && go mod init [module-path]`
+```bash
+mkdir myproject && go mod init [module-path]
+```
 
 Add makercad dependency
 
-`go get github.com/marcuswu/makercad`
+```bash
+go get github.com/marcuswu/makercad
+```
 
 Start designing!
 
@@ -46,13 +50,15 @@ Start designing!
 
 Start by creating an instance of MakerCad:
 
-`cad := makercad.NewMakerCad()`
+```bash
+cad := makercad.NewMakerCad()
+```
 
 ### Creating Primitives ###
 
 #### Plane ####
 Planes can be used for creating sketches or placing primitives
-```
+```go
 		MyTopPlane := sketcher.NewPlaneParametersFromVectors(
 			sketcher.NewVectorFromValues(0, 0, 0),  // Location (origin for the plane)
 			sketcher.NewVectorFromValues(0, 0, 1),  // Normal (Z) direction vector
@@ -62,10 +68,12 @@ Planes can be used for creating sketches or placing primitives
 
 A plane can also be created from a face of a model
 
-`sketcher.NewPlaneParametersFromCoordinateSystem(aFace.Plane())`
+```go
+sketcher.NewPlaneParametersFromCoordinateSystem(aFace.Plane())
+```
 
 There are also some origin planes predefined in MakerCAD:
-```
+```go
 type MakerCad struct {
 	sketches    []*Sketch
 	FrontPlane  *sketcher.PlaneParameters
@@ -81,23 +89,31 @@ type MakerCad struct {
 Provide a plane to locate and orient the shape, its dimensions, and whether to center it on the location
 Specific global coordinates can be specified by altering the plane
 
-`block := cad.MakeBox(cad.TopPlane, width, depth, height, true | false)`
+```go
+block := cad.MakeBox(cad.TopPlane, width, depth, height, true | false)
+```
 
 #### Cylinder ####
 Provide a plane to locate and orient the shape and its radius and height. Cylinders are always centered on the plane origin
 
-`cylinder := cad.MakeCylinder(cad.TopPlane, radius, height)`
+```go
+cylinder := cad.MakeCylinder(cad.TopPlane, radius, height)
+```
 
 ### Boolean operations ###
 Boolean operations allow combining shapes to create more complex features on your model. These operations return a CadOperation from which the resulting shape can be retrieved.
 
 #### Union ####
 
-`op, err = cad.Combine(targetShape, makercad.ListOfShape{tools...})`
+```go
+op, err = cad.Combine(targetShape, makercad.ListOfShape{tools...})
+```
 
 #### Difference ####
 
-`op, err = cad.Remove(targetShape, makercad.ListOfShape{tools...})`
+```go
+op, err = cad.Remove(targetShape, makercad.ListOfShape{tools...})
+```
 
 ### Sketching ###
 Sketching allows for creation of more complex 3D shapes by drawing a 2D shape, optionally adding constraints and solving them, then extruding or revolving them to 3D shapes
@@ -105,21 +121,29 @@ Sketching allows for creation of more complex 3D shapes by drawing a 2D shape, o
 #### Creating a Sketch ####
 A sketch may be created on a plane or a face of a shape:
 
-`sketch := cad.Sketch(plane | face)`
+```go
+sketch := cad.Sketch(plane | face)
+```
 
 #### Defining Geometry ####
 
 Lines are defined by start and end points
 
-`l1 := sketch.Line(startX, startY, endX, endY)`
+```go
+l1 := sketch.Line(startX, startY, endX, endY)
+```
 
 Arcs are defined clockwise around a center point
 
-`arc1 := sketch.Arc(centerX, centerY, startX, startY, endX, endY)`
+```go
+arc1 := sketch.Arc(centerX, centerY, startX, startY, endX, endY)
+```
 
 Circles are defined by a center point and a diameter (does not define a constraint)
 
-`circ1 := sketch.Circle(centerX, centerY, diameter)`
+```go
+circ1 := sketch.Circle(centerX, centerY, diameter)
+```
 
 #### Constraining Geometry ####
 Sometimes it is not easy to determine the exact geometry when defining a sketch. In these cases, let the computer do the work. Define geometry close to what you need and specify constraints to define how the final geometry should relate.
@@ -144,72 +168,84 @@ Sometimes it is not easy to determine the exact geometry when defining a sketch.
 
 Many of these constraints also have convenience functions on an entity. For instance to set a line's length:
 
-`line1.Length(10)`
+```go
+line1.Length(10)
+```
 
 Most of these convenience functions return the entity so they can be chained:
 
-`line1.Length(10).Horizontal()`
+```go
+line1.Length(10).Horizontal()
+```
 
 #### Solving Constraints ####
 Runs the constraint solver algorithm. Returns an error should it be unable to solve.
 
-`err = sketch.Solve()`
+```go
+err = sketch.Solve()
+```
 
 #### Debugging Sketches ####
 Sketches can be overconstrained or underconstrained. The OverConstrained method returns a list of constraints that overdefine the problem:
 
-`fmt.PrintLn("Over constrained constraints: ", sketch.OverConstrained())`
+```go
+fmt.PrintLn("Over constrained constraints: ", sketch.OverConstrained())
+```
 
 An underconstrained sketch will have multiple solutions (often infinite).
 
 A sketch can be converted to an SVG image:
 
-`sketch.LogDebug("sketch.svg")`
+```go
+sketch.LogDebug("sketch.svg")
+```
 
 The constraint solver uses a graph based approach to simplifying the system of equations that are necessary to solve a sketch. If there is an issue with a sketch, logging the graph can be helpful in determining why:
 
-`sketch.ExportImage("sketch.dot")`
+```go
+sketch.ExportImage("sketch.dot")
+```
 
 These .dot files can be visualized via GraphViz:
-```
+```bash
 dot -Tsvg clustered.dot -o clustered.svg
 ```
 
 #### Extruding or Revolving Sketches ####
 First, convert the sketch into a Face:
-```
+```go
 face1 := makercad.NewFace(sketch)
 ```
 
 Then it can be extruded or revolved
-```
+```go
 operation, err := face1.Extrude(distance)
 ```
 
-```
+```go
 operation, err := face1.Revolve(axis, angleInRadians)
 ```
 
 With either of these, if combining via a boolean operation with an existing shape, it can be done in one step:
-```
+```go
 operation1, err := face1.ExtrudeMerging(distance, MergeType, makercad.ListOfShape{someOp.Shape()})
 operation2, err := face2.ExtrudeMerging(distance, MergeType, makercad.ListOfShape{someOp.Shape()})
 ```
 
 ### Finding a Face or Edge ###
 A Shape can return its list of Faces:
-```
+```go
 shape1.Faces()
 ```
 
 A Face or list of Faces can return its list of Edges:
-```
+```go
 face1.Edges()
 shape1.Faces().Edges()
 ```
 
 A list of Faces or Edges can be filtered and sorted:
-```
+```go
 someOperation.Shape().Faces().Edges().
   IsCircle().
   Matching(func(e *sketcher.Edge) bool {
@@ -218,7 +254,7 @@ someOperation.Shape().Faces().Edges().
 ```
 
 Connecting the pieces:
-```
+```go
 	block := cad.MakeBox(cad.TopPlane, blockWidth, blockWidth, blockHeight, true)
 
 	// Find the top face aligned with Z positive
@@ -241,7 +277,7 @@ Connecting the pieces:
 
 ### Saving Results ###
 MakerCAD can export to STL or STEP:
-```
+```go
 exports := makercad.ListOfShape{block}
 cad.ExportStl("my-model.stl", exports, makercad.QualityHigh)
 cad.ExportStep("my-model.step", exports)
