@@ -1,5 +1,6 @@
 # MakerCAD
 Free CAD software by Makers for Makers.
+
 Read more about MakerCAD and why I made it [on my blog](https://www.digitaltorque.com/articles/makercad-1/)
 
 ## The Vision ##
