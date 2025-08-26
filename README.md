@@ -15,6 +15,9 @@ Long term goals:
 1. Build a code editor UI (a la OpenSCAD)
 2. Build a UI for non-coders
 
+## API Documentation
+Find API documentation at [pkg.go.dev](https://pkg.go.dev/github.com/marcuswu/makercad)
+
 ## Getting Started
 
 ### Install dependencies
