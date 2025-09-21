@@ -24,6 +24,12 @@ Find API documentation at [pkg.go.dev](https://pkg.go.dev/github.com/marcuswu/ma
  * [OpenCascade](https://dev.opencascade.org/release) CAD Kernel - Installing a binary package is recommended (compiling takes hours).
  * [occwrapper](https://github.com/marcuswu/occwrapper) OpenCascade C wrapper to help make using OpenCascade with Go easier.
 
+### VSCode extension
+An extension for VSCode exists to help visualizing what you build:
+* [MakerCAD-vscode](https://marketplace.visualstudio.com/items?itemName=MarcusWu.makercad-vscode)
+
+The extension does require exporting model(s) to stl format (does not preclude exporting to other formats).
+
 ## Support
 If this project is important to you, help:
  * Encourage me by sharing what you have made with it (hashtag #makercad)
