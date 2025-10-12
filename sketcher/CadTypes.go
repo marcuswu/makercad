@@ -36,6 +36,12 @@ func (v *Vector) ToVector() gp.Vec {
 	return gp.NewVec(v.X, v.Y, v.Z)
 }
 
+func (v *Vector) Invert() {
+	v.X = -v.X
+	v.Y = -v.Y
+	v.Z = -v.Z
+}
+
 func (v *Vector) ToString() string {
 	return fmt.Sprintf("{ x: %f, y: %f, z: %f }\n", v.X, v.Y, v.Z)
 }
