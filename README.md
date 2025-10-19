@@ -3,6 +3,8 @@ Free CAD software by Makers for Makers.
 
 Read more about MakerCAD and why I made it [on my blog](https://www.digitaltorque.com/articles/makercad-1/)
 
+Status updates are posted on [discord](https://discord.gg/9EwXdfuJhw)
+
 ## The Vision ##
 Build a software based CAD suite that provides:
 
