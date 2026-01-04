@@ -12,6 +12,8 @@ github.com/marcuswu/dlineate v0.1.7 h1:0oWjZJkVP6n7MR5PL9CHUBDThSFOzNZIcuJDJ7I54
 github.com/marcuswu/dlineate v0.1.7/go.mod h1:D+9AMnxfdLvc/vYwAtFRgw5s6csqXvxBwKHHF6HqNzU=
 github.com/marcuswu/dlineate v0.2.0 h1:3LYrj1JCdnmfxrDjQZMfS6g6iFRC454mqdIEql5aUgs=
 github.com/marcuswu/dlineate v0.2.0/go.mod h1:GMqe/WGnQP7vRQl0EZNdNDeD7gBeBlOQiFukeENZNZs=
+github.com/marcuswu/dlineate v0.2.1 h1:QeUboH20w+PoUgyNkM3qGnMa/qetuFbhpdKjIpycFaE=
+github.com/marcuswu/dlineate v0.2.1/go.mod h1:XSDSeAH5rDXUEYkObL95zvAtVdA+Ez4IB2mx2RBCqik=
 github.com/marcuswu/gooccwrapper v0.1.6 h1:+72rpHj7vbu2Ix+0khyd/XSno1iagV0aAPag106Q7JM=
 github.com/marcuswu/gooccwrapper v0.1.6/go.mod h1:KAySvkIotfWEIUuhLdcKBksJjNlrPbe2Wz1JXUxtel8=
 github.com/mattn/go-colorable v0.1.13/go.mod h1:7S9/ev0klgBDR4GtXTXX8a3vIGJpMovkB8vQcUbaXHg=

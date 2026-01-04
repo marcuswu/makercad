@@ -5,7 +5,7 @@ go 1.24.0
 toolchain go1.24.2
 
 require (
-	github.com/marcuswu/dlineate v0.2.0
+	github.com/marcuswu/dlineate v0.2.1
 	github.com/marcuswu/gooccwrapper v0.1.6
 	github.com/rs/zerolog v1.34.0
 )
