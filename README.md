@@ -11,9 +11,7 @@ Build a software based CAD suite that provides:
 3. Collaboration on modeling (git pull requests)
 4. Version control (also via git)
 
-Long term goals:
-1. Build a code editor UI (a la OpenSCAD)
-2. Build a UI for non-coders
+See the [roadmap](https://github.com/marcuswu/makercad/issues) for where the project is heading.
 
 ## Help
 You can seek out help [on our Discord server](https://discord.gg/9EwXdfuJhw).
