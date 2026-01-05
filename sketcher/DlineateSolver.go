@@ -203,8 +203,8 @@ func (s *DlineateSolver) VerticalLine(l *Line) {
 func (s *DlineateSolver) VerticalPoints(p1 *Point, p2 *Point) {
 	vl := s.CreateLine(p1.X, p1.Y, p2.X, p2.Y)
 	vl.isConstruction = true
-	s.system.AddCoincidentConstraint(vl.getElement(), p1.getElement())
-	s.system.AddCoincidentConstraint(vl.getElement(), p2.getElement())
+	s.system.AddCoincidentConstraint(vl.getElement().Start(), p1.getElement())
+	s.system.AddCoincidentConstraint(vl.getElement().End(), p2.getElement())
 	s.system.AddVerticalConstraint(vl.getElement())
 }
 
