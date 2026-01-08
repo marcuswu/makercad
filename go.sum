@@ -8,12 +8,10 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
-github.com/marcuswu/dlineate v0.1.7 h1:0oWjZJkVP6n7MR5PL9CHUBDThSFOzNZIcuJDJ7I546o=
-github.com/marcuswu/dlineate v0.1.7/go.mod h1:D+9AMnxfdLvc/vYwAtFRgw5s6csqXvxBwKHHF6HqNzU=
-github.com/marcuswu/dlineate v0.2.0 h1:3LYrj1JCdnmfxrDjQZMfS6g6iFRC454mqdIEql5aUgs=
-github.com/marcuswu/dlineate v0.2.0/go.mod h1:GMqe/WGnQP7vRQl0EZNdNDeD7gBeBlOQiFukeENZNZs=
 github.com/marcuswu/dlineate v0.2.1 h1:QeUboH20w+PoUgyNkM3qGnMa/qetuFbhpdKjIpycFaE=
 github.com/marcuswu/dlineate v0.2.1/go.mod h1:XSDSeAH5rDXUEYkObL95zvAtVdA+Ez4IB2mx2RBCqik=
+github.com/marcuswu/dlineate v0.2.2 h1:kwGWzaNUBwhUMlZSpRXb4mjcFUNFE2YwrxY5h9DUMcE=
+github.com/marcuswu/dlineate v0.2.2/go.mod h1:XSDSeAH5rDXUEYkObL95zvAtVdA+Ez4IB2mx2RBCqik=
 github.com/marcuswu/gooccwrapper v0.1.6 h1:+72rpHj7vbu2Ix+0khyd/XSno1iagV0aAPag106Q7JM=
 github.com/marcuswu/gooccwrapper v0.1.6/go.mod h1:KAySvkIotfWEIUuhLdcKBksJjNlrPbe2Wz1JXUxtel8=
 github.com/mattn/go-colorable v0.1.13/go.mod h1:7S9/ev0klgBDR4GtXTXX8a3vIGJpMovkB8vQcUbaXHg=
@@ -48,10 +46,10 @@ golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.12.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.35.0 h1:vz1N37gP5bs89s7He8XuIYXpyY0+QlsKmzipCbUtyxI=
-golang.org/x/sys v0.35.0/go.mod h1:BJP2sWEmIv4KK5OTEluFJCKSidICx8ciO85XgH3Ak8k=
 golang.org/x/sys v0.39.0 h1:CvCKL8MeisomCi6qNZ+wbb0DN9E5AATixKsvNtMoMFk=
 golang.org/x/sys v0.39.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=
+golang.org/x/sys v0.40.0 h1:DBZZqJ2Rkml6QMQsZywtnjnnGvHza6BTfYFWY9kjEWQ=
+golang.org/x/sys v0.40.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.3/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
 golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
